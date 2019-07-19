@@ -12,29 +12,31 @@ import kotlin.properties.Delegates
 
 class TopWhoAccessibilityService : AccessibilityService() {
 
-    fun logi(msg: String){
-        Log.i(TAG,msg)
+    fun logi(msg: String) {
+        Log.i(TAG, msg)
     }
-    companion object{
+
+    companion object {
         var instances: TopWhoAccessibilityService by Delegates.notNull()
     }
-    private val TAG= TopWhoAccessibilityService::class.java.simpleName
+
+    private val TAG = TopWhoAccessibilityService::class.java.simpleName
     override fun onInterrupt() {
-        Log.i(TAG,"onInterrupt")
+        Log.i(TAG, "onInterrupt")
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onAccessibilityEvent(p0: AccessibilityEvent?) {
-        Log.i(TAG,"onAccessibilityEvent")
+        Log.i(TAG, "onAccessibilityEvent")
         when (p0?.eventType) {
             AccessibilityEvent.TYPE_VIEW_CLICKED -> {
-                Log.i(TAG,"TYPE_VIEW_CLICKED")
+                Log.i(TAG, "TYPE_VIEW_CLICKED")
             }
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
-                val result= "${p0.packageName} \n ${p0.className} "
-                FloatWindowService.setText(result)
-                logi("${p0.packageName} \n ${p0.className} ")
-                Log.i(TAG,result)
+                val result = "${p0.packageName} \n ${p0.className} "
+                if (FloatWindowService.isStarted)
+                    FloatWindowService.setText(result)
+                Log.i(TAG, result)
             }
             null -> {
 
@@ -44,20 +46,20 @@ class TopWhoAccessibilityService : AccessibilityService() {
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
-        Log.i(TAG,"onUnbind")
+        Log.i(TAG, "onUnbind")
         return super.onUnbind(intent)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        Log.i(TAG,"onStartCommand")
+        Log.i(TAG, "onStartCommand")
 
         return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onServiceConnected() {
         super.onServiceConnected()
-        Log.i(TAG,"onServiceConnected")
-        instances =this
+        Log.i(TAG, "onServiceConnected")
+        instances = this
 
     }
 }
