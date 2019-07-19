@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<accessibility-service
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:description="@string/topWhoAccessibilityDescription"
+        android:accessibilityEventTypes="typeAllMask"
+        android:accessibilityFeedbackType="feedbackAllMask"
+        android:notificationTimeout="100"
+        android:accessibilityFlags="flagDefault"
+        android:canRetrieveWindowContent="true"/>
+<!--  xmlns:android="http://schemas.android.com/apk/res/android"
+        //用于描述此服务的信息,会显示在系统开启服务的设置界面
+        android:description="@string/app_accessibility_description"
+        //接收EventTypes的包名,多个包名用,隔开  需要辅助的app包名，不写表示所有app
+        android:packageNames="com.tencent.mm,com.tencent.mobileqq"
+        //可以接收的事件
+        android:accessibilityEventTypes="typeAllMask"
+        //字面意思:反馈类型.官方解释真的"很详细".
+        android:accessibilityFeedbackType="feedbackAllMask"
+        //发送2次事件的时间间隔,超过后事件作废
+        android:notificationTimeout="100"
+        //设置界面,在系统的启动服务界面会出现一个设置按钮,用来打开这个Activity的;
+        android:settingsActivity="com.angcyo.SettingsActivity"
+        //官方解释很模糊,暂且就使用缺省值吧
+        android:accessibilityFlags="flagDefault"
+        //表明此服务是否可以读取窗口中的内容,应该是最重要的属性了.在运行时不可修改;
+        android:canRetrieveWindowContent="true"-->
