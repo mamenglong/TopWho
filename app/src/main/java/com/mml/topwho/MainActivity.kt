@@ -13,6 +13,7 @@ import android.provider.Settings
 import android.view.accessibility.AccessibilityManager
 import android.widget.Switch
 import androidx.appcompat.app.AppCompatActivity
+import com.mml.topwho.receiver.NotificationActionReceiver
 import com.mml.topwho.service.FloatWindowService
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -22,6 +23,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initView()
+        NotificationActionReceiver.showNotification(this,false)
+//        NotificationActionReceiver.notification(this)
     }
 
     private fun initView() {
@@ -52,7 +55,7 @@ class MainActivity : AppCompatActivity() {
                     if (FloatWindowService.isStarted) {
                         //悬浮窗服务开启
                         if (sw.isChecked) {
-                            FloatWindowService.show()
+                            FloatWindowService.show("")
                         } else {
                             FloatWindowService.dismiss()
                         }

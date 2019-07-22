@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.mml.topwho">
+          xmlns:tools="http://schemas.android.com/tools" package="com.mml.topwho">
     <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <application
@@ -10,7 +10,7 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:name=".TopWhoApplication"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme" tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -33,6 +33,12 @@
                     android:resource="@xml/accessibility_service_config"/>
         </service>
         <service android:name=".service.FloatWindowService"/>
+
+        <receiver android:name=".receiver.NotificationActionReceiver">
+            <intent-filter>
+                <action android:name="com.mml.topwho.receiver.ACTION_NOTIFICATION_RECEIVER"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

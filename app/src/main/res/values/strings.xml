@@ -7,4 +7,12 @@
     <string name="dialog_enable_overlay_window_msg">Android 7.1.1 以上, 请开启悬浮窗权限</string>
     <string name="dialog_enable_overlay_window_positive_btn">去开启</string>
     <string name="sw_open_accessibility_permission">启用无障碍服务</string>
+
+
+    <string name="is_running">%s 正在运行</string>
+    <bool name="use_accessibility_service">false</bool>
+    <string name="touch_to_open">点击设置.</string>
+    <string name="noti_action_pause">暂停</string>
+    <string name="noti_action_resume">恢复</string>
+    <string name="noti_action_stop">停止</string>
 </resources>

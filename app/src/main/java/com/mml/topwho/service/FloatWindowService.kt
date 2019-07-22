@@ -15,6 +15,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import androidx.annotation.RequiresApi
+import com.mml.topwho.showToast
 import kotlin.properties.Delegates
 
 
@@ -63,6 +64,7 @@ class FloatWindowService : Service() {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         logi("onStartCommand")
         showFloatingWindow()
+        isShowed=true
         instances = this
         return super.onStartCommand(intent, flags, startId)
     }
@@ -88,7 +90,7 @@ class FloatWindowService : Service() {
     }
 
     private fun addView() {
-        windowManager!!.addView(button, layoutParams)
+        windowManager!!.addView(button,layoutParams)
     }
 
     private inner class FloatingListener : View.OnTouchListener, View.OnClickListener {
@@ -128,13 +130,35 @@ class FloatWindowService : Service() {
 
     companion object {
         var isStarted = false
+        var isShowed =false
         var instances: FloatWindowService by Delegates.notNull()
         fun setText(msg: String) = instances.button?.setText(msg)
         fun dismiss() {
-            instances.removeView()
+           if (isShowed) {
+               instances.removeView()
+               isShowed=false
+           }else{
+               showToast("悬浮窗已经移除")
+           }
         }
-        fun show(){
-            instances.addView()
+
+        fun show(msg: String) {
+            if (!isShowed) {
+                if (isStarted) {
+                    if (instances.button == null)
+                        instances.addView()
+                    if (msg == "") {
+                        instances.button?.text = "TopWho Window"
+                    } else {
+                        instances.button?.text = msg
+                    }
+                } else {
+                    showToast("请先开启悬浮窗")
+                }
+            } else{
+                showToast("悬浮窗已开启")
+            }
+            isShowed= true
         }
     }
 }
