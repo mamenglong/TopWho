@@ -56,6 +56,7 @@ class FloatWindowService : Service() {
 
     override fun onDestroy() {
         logi("onDestroy")
+        windowManager!!.removeViewImmediate(button)
         isStarted = false
         super.onDestroy()
     }
@@ -86,11 +87,13 @@ class FloatWindowService : Service() {
     }
 
     private fun removeView() {
+        logi("removeView:$button")
         windowManager!!.removeView(button)
     }
 
     private fun addView() {
         windowManager!!.addView(button,layoutParams)
+        logi("addView:$button")
     }
 
     private inner class FloatingListener : View.OnTouchListener, View.OnClickListener {
@@ -145,8 +148,11 @@ class FloatWindowService : Service() {
         fun show(msg: String) {
             if (!isShowed) {
                 if (isStarted) {
-                    if (instances.button == null)
+                    if (instances.button != null) {
                         instances.addView()
+                    } else{
+                        showToast("异常,请重启APP")
+                    }
                     if (msg == "") {
                         instances.button?.text = "TopWho Window"
                     } else {

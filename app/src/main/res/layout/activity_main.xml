@@ -14,13 +14,20 @@
             app:layout_constraintTop_toTopOf="parent"
             android:checked="false"
             android:layout_height="wrap_content"/>
+    <FrameLayout android:layout_width="match_parent"
+                 android:background="@drawable/item_background"
+                 app:layout_constraintStart_toStartOf="parent"
+                 app:layout_constraintBottom_toBottomOf="@id/sw_open_float_permission"
+                 app:layout_constraintTop_toTopOf="@id/sw_open_accessibility_permission"
+                 android:id="@+id/frameLayout"
+                 android:layout_height="wrap_content"/>
     <Switch android:layout_width="match_parent"
             android:layout_marginTop="5dp"
             android:text="@string/sw_open_accessibility_permission"
             android:id="@+id/sw_open_accessibility_permission"
             android:background="@drawable/item_background"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/sw_open_float_permission"
+            app:layout_constraintTop_toBottomOf="@id/frameLayout"
             android:checked="false"
             android:layout_height="wrap_content"/>
 
