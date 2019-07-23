@@ -4,20 +4,16 @@ import android.accessibilityservice.AccessibilityServiceInfo
 import android.annotation.TargetApi
 import android.app.AlertDialog
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import androidx.preference.PreferenceFragmentCompat
 import android.util.Log
 import android.view.accessibility.AccessibilityManager
 import android.widget.Switch
 import androidx.appcompat.app.AppCompatActivity
-import androidx.preference.Preference
-import androidx.preference.PreferenceScreen
-import androidx.preference.SwitchPreferenceCompat
+import com.mml.topwho.fragment.SwitchFragment
 import com.mml.topwho.receiver.NotificationActionReceiver
 import com.mml.topwho.service.FloatWindowService
 import com.mml.topwho.sp.SP
@@ -160,17 +156,17 @@ class MainActivity : AppCompatActivity() {
         Log.i("MainActivity","onResume")
         initSwitchStatus()
     }
-    fun checkFloatPermission():Boolean{
+    fun checkFloatPermission(context: Context):Boolean{
         Log.i(TAG,"checkFloatPermission")
-        if (!Settings.canDrawOverlays(this)) {
+        if (!Settings.canDrawOverlays(context)) {
             //没有悬浮窗权限
-            AlertDialog.Builder(this)
+            AlertDialog.Builder(context)
                 .setMessage(R.string.dialog_enable_overlay_window_msg)
                 .setPositiveButton(
                     R.string.dialog_enable_overlay_window_positive_btn
                 ) { dialog, _ ->
                     val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
-                    intent.data = Uri.parse("package:${this.packageName}")
+                    intent.data = Uri.parse("package:${context.packageName}")
                     startActivityForResult(intent, 0)
                     dialog.dismiss()
                 }
@@ -181,46 +177,21 @@ class MainActivity : AppCompatActivity() {
                 .show()
             return false
         }else{ //有悬浮窗权限
-            if (FloatWindowService.isStarted) {
-                //悬浮窗服务开启
-                if (sp.switch_open_float) {
-                    FloatWindowService.show("")
-                } else {
-                    FloatWindowService.dismiss()
-                }
-            } else { //没有开启服务去开启
-                startService(Intent(this, FloatWindowService::class.java))
-            }
+            openFloatWindow()
             return true
         }
 
     }
-    class SwitchFragment : PreferenceFragmentCompat() {
-        val TAG="SwitchFragment"
-        override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-            preferenceManager.sharedPreferencesName = "setting"
-            setPreferencesFromResource(R.xml.root_preferences, rootKey)
-        }
-
-        override fun onPreferenceTreeClick(preference: Preference?): Boolean {
-            preference?.let {
-                when(it.key) {
-                   "switch_open_float_permission"->{
-                       it as SwitchPreferenceCompat
-                       Log.i(TAG,"${it.key}:${it.isChecked}")
-                       checkFloatPermission(context!!)
-                   }
-                    "switch_open_float" ->{
-                        it as SwitchPreferenceCompat
-                        Log.i(TAG,"${it.key}:${it.isChecked}")
-                    }
-                    else->{
-
-                    }
-                }
+    private fun openFloatWindow(){
+        if (FloatWindowService.isStarted) {
+            //悬浮窗服务开启
+            if (sp.switch_open_float) {
+                FloatWindowService.show("")
+            } else {
+                FloatWindowService.dismiss()
             }
-            return super.onPreferenceTreeClick(preference)
+        } else { //没有开启服务去开启
+            startService(Intent(this, FloatWindowService::class.java))
         }
-
     }
 }
