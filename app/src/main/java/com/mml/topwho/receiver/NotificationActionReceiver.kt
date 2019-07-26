@@ -18,7 +18,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
     private val TAG = NotificationActionReceiver::class.java.simpleName
 
     companion object {
-        private const val NOTIFICATION_ID = 12
+        private const val NOTIFICATION_ID = 120
         private const val ACTION_NOTIFICATION_RECEIVER = "com.mml.topwho.receiver.ACTION_NOTIFICATION_RECEIVER"
         const val ACTION_PAUSE = 0
         const val ACTION_RESUME = 1
@@ -28,7 +28,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
         fun notification(context: Context) {
             val intent = Intent(context, MainActivity::class.java)
             val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            //8.0 ??????channelId ??????
+            //8.0   channelId
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val channelId = "default"
                 val channelName = "通知"
@@ -41,7 +41,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 )
             }
 
-            //??TaskStackBuilder
+            //TaskStackBuilder
             val stackBuilder = TaskStackBuilder.create(context)
             stackBuilder.addParentStack(MainActivity::class.java)
             stackBuilder.addNextIntent(intent)
@@ -58,7 +58,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 .setContentIntent(pendingIntent)
                 .build()
 
-            manager.notify(1, notification)
+            manager.notify(14, notification)
         }
 
         fun showNotification(context: Context, isPaused: Boolean) {

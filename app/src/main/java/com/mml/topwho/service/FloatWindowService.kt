@@ -1,18 +1,16 @@
 package com.mml.topwho.service
 
 import android.app.Service
-import android.view.MotionEvent
 import android.content.Intent
-import android.os.IBinder
-import android.view.WindowManager
-import android.view.Gravity
+import android.graphics.Color
 import android.graphics.PixelFormat
 import android.os.Build
-import android.graphics.Color
-import android.net.Uri
-import android.provider.Settings
+import android.os.IBinder
 import android.util.Log
+import android.view.Gravity
+import android.view.MotionEvent
 import android.view.View
+import android.view.WindowManager
 import android.widget.Button
 import androidx.annotation.RequiresApi
 import com.mml.topwho.showToast
@@ -65,7 +63,7 @@ class FloatWindowService : Service() {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         logi("onStartCommand")
         showFloatingWindow()
-        isShowed=true
+        isShowed = true
         instances = this
         return super.onStartCommand(intent, flags, startId)
     }
@@ -92,7 +90,7 @@ class FloatWindowService : Service() {
     }
 
     private fun addView() {
-        windowManager!!.addView(button,layoutParams)
+        windowManager!!.addView(button, layoutParams)
         logi("addView:$button")
     }
 
@@ -133,38 +131,40 @@ class FloatWindowService : Service() {
 
     companion object {
         var isStarted = false
-        var isShowed =false
+        var isShowed = false
         var instances: FloatWindowService by Delegates.notNull()
-        fun setText(msg: String) = instances.button?.setText(msg)
+        fun setText(msg: String): Unit? {
+            return instances.button?.setText(msg)
+        }
         fun dismiss() {
-           if (isShowed) {
-               instances.removeView()
-               isShowed=false
-           }else{
-               showToast("悬浮窗已经移除")
-           }
+            Log.i("FloatWindowService", "dismiss before:$isShowed")
+            if (isShowed) {
+                instances.removeView()
+            } else {
+                showToast("悬浮窗已经移除")
+            }
+            isShowed = false
+            Log.i("FloatWindowService", "dismiss after:$isShowed")
         }
 
-        fun show(msg: String) {
+        fun show(msg: String?=null) {
+            Log.i("FloatWindowService", "show")
             if (!isShowed) {
                 if (isStarted) {
+                    instances.button?.text=msg?:"TopWho Window"
+                    
                     if (instances.button != null) {
                         instances.addView()
-                    } else{
-                        showToast("异常,请重启APP")
-                    }
-                    if (msg == "") {
-                        instances.button?.text = "TopWho Window"
                     } else {
-                        instances.button?.text = msg
+                        showToast("异常,请重启APP")
                     }
                 } else {
                     showToast("请先开启悬浮窗")
                 }
-            } else{
+            } else {
                 showToast("悬浮窗已开启")
             }
-            isShowed= true
+            isShowed = true
         }
     }
 }

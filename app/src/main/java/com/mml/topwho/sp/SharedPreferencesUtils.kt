@@ -2,7 +2,7 @@ package com.mml.topwho.sp
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import com.mml.topwho.TopWhoApplication
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -47,6 +47,7 @@ open class SharedPreferencesUtils(context: Context) {
     }
 
     private val preferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+//    private var pf= context.getSharedPreferences("")
 
 //    var username by SharedPreferenceDelegates.string(defaultValue = "this is username")
 //
@@ -60,7 +61,7 @@ open class SharedPreferencesUtils(context: Context) {
 //
 //    var setString by SharedPreferenceDelegates.setString()
 
-    public object SharedPreferenceDelegates {
+    protected object SharedPreferenceDelegates {
 
         fun int(defaultValue: Int = 0) = object : ReadWriteProperty<SharedPreferencesUtils, Int> {
 

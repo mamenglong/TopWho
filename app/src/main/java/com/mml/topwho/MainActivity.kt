@@ -1,12 +1,10 @@
 package com.mml.topwho
 
 import android.accessibilityservice.AccessibilityServiceInfo
-import android.annotation.TargetApi
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
@@ -28,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         initView()
         NotificationActionReceiver.showNotification(this, false)
-//        NotificationActionReceiver.notification(this)
+        NotificationActionReceiver.notification(this)
     }
 
     private fun initView() {
@@ -36,81 +34,38 @@ class MainActivity : AppCompatActivity() {
             .beginTransaction()
             .replace(R.id.frameLayout, SwitchFragment())
             .commit()
-        //首次刷新
-        refreshSwitch()
-        sw_open_float_permission.setOnCheckedChangeListener { sw, b ->
-            sw as Switch
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (!Settings.canDrawOverlays(this)) {
-                    //没有悬浮窗权限
-                    AlertDialog.Builder(this)
-                        .setMessage(R.string.dialog_enable_overlay_window_msg)
-                        .setPositiveButton(
-                            R.string.dialog_enable_overlay_window_positive_btn
-                        ) { dialog, _ ->
-                            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
-                            intent.data = Uri.parse("package:$packageName")
-                            startActivityForResult(intent, 0)
-                            dialog.dismiss()
-                        }
-                        .setNegativeButton(android.R.string.cancel) { dialog, _ ->
-                            refreshSwitch()
-                            dialog.dismiss()
-                        }
-                        .create()
-                        .show()
-                } else { //有悬浮窗权限
-                    if (FloatWindowService.isStarted) {
-                        //悬浮窗服务开启
-                        if (b) {
-                            FloatWindowService.show("")
-                        } else {
-                            FloatWindowService.dismiss()
-                        }
-                    } else { //没有开启服务去开启
-                        startService(Intent(this, FloatWindowService::class.java))
-                    }
-                }
-            }
-            refreshSwitch()
-        }
         sw_open_accessibility_permission.setOnClickListener { sw ->
             sw as Switch
-//            if (!isAccessibilityServiceEnabled()) {
+            if (!isAccessibilityServiceEnabled()) {
                 val accessibleIntent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
                 startActivity(accessibleIntent)
-//            }
-        }
-    }
-
-    private fun refreshSwitch() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!Settings.canDrawOverlays(this)) { //没有权限,显示开启权限
-                sw_open_float_permission.apply {
-                    text = getString(R.string.sw_open_float_permission)
-                    isChecked = false
-                }
-            } else {//有权限
-                if (sw_open_float_permission.isChecked) { //显示悬浮窗
-                    sw_open_float_permission.apply {
-                        text = getString(R.string.sw_close_float_window)
-                    }
-                } else { //隐藏悬浮窗
-                    sw_open_float_permission.apply {
-                        text = getString(R.string.sw_show_float_window)
-                    }
-                }
             }
         }
+        btn_open_float.setOnClickListener {
+            val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
+            intent.data = Uri.parse("package:$packageName")
+            startActivity(intent)
+        }
+        btn_open_accessibility.setOnClickListener {
+            val accessibleIntent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+            startActivity(accessibleIntent)
+        }
+
     }
+
 
     private fun initSwitchStatus() {
         Log.i("MainActivity","initSwitchStatus")
         sw_open_accessibility_permission.isChecked = isAccessibilityServiceEnabled()
-        if (Settings.canDrawOverlays(this)) {
-            sw_open_float_permission.isChecked = FloatWindowService.isShowed
-        } else {
-            sw_open_float_permission.isChecked = false
+        if (isAccessibilityServiceEnabled()){
+            btn_open_accessibility.setDrawableRight(R.drawable.ic_check_circle_48dp)
+        }else{
+            btn_open_accessibility.setDrawableRight(R.drawable.ic_uncheck_circle_48dp)
+        }
+        if (Settings.canDrawOverlays(this)){
+            btn_open_float.setDrawableRight(R.drawable.ic_check_circle_48dp)
+        } else{
+            btn_open_float.setDrawableRight(R.drawable.ic_uncheck_circle_48dp)
         }
     }
 
@@ -129,27 +84,6 @@ class MainActivity : AppCompatActivity() {
         return false
     }
 
-    @TargetApi(Build.VERSION_CODES.M)
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == 0) {
-            if (!Settings.canDrawOverlays(this)) {
-                sw_open_float_permission.apply {
-                    text = getString(R.string.sw_open_float_permission)
-                    isChecked = false
-                }
-                showToast("悬浮窗授权失败!")
-            } else {
-                sw_open_float_permission.apply {
-                    text = getString(R.string.sw_close_float_window)
-                    isChecked = true
-                }
-                showToast("悬浮窗授权成功!")
-                sw_open_float_permission.isChecked=true
-            }
-        } else {
-            super.onActivityResult(requestCode, resultCode, data)
-        }
-    }
 
     override fun onResume() {
         super.onResume()
@@ -192,6 +126,7 @@ class MainActivity : AppCompatActivity() {
             }
         } else { //没有开启服务去开启
             startService(Intent(this, FloatWindowService::class.java))
+            FloatWindowService.show("")
         }
     }
 }

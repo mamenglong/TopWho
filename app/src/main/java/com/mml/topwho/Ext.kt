@@ -11,6 +11,9 @@ import androidx.core.content.ContextCompat.getSystemService
 import android.os.Build
 import android.os.Binder.getCallingUid
 import android.provider.Settings
+import android.view.View
+import android.widget.Button
+import android.widget.TextView
 import java.lang.reflect.AccessibleObject.setAccessible
 
 
@@ -22,36 +25,84 @@ fun showToast(msg:String)= run {
             Toast.makeText(TopWhoApplication.instances,msg,Toast.LENGTH_SHORT).show()
     }
 }
-fun checkFloatPermission(context: Context): Boolean {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT)
-        return true
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-        try {
-            var cls = Class.forName("android.content.Context")
-            val declaredField = cls.getDeclaredField("APP_OPS_SERVICE")
-            declaredField.isAccessible = true
-            var obj: Any? = declaredField.get(cls) as? String ?: return false
-            obj = cls.getMethod("getSystemService", String::class.java).invoke(context, obj)
-            cls = Class.forName("android.app.AppOpsManager")
-            val declaredField2 = cls.getDeclaredField("MODE_ALLOWED")
-            declaredField2.isAccessible = true
-            val checkOp = cls.getMethod("checkOp", Integer.TYPE, Integer.TYPE, String::class.java)
-            val result = checkOp.invoke(obj, 24, Binder.getCallingUid(), context.packageName) as Int
-            return result == declaredField2.getInt(cls)
-        } catch (e: Exception) {
-            return false
-        }
+fun View.extSetVisibility(visible: Boolean) = if (visible) {
+    this.visibility = View.VISIBLE
+} else {
+    this.visibility = View.INVISIBLE
+}
 
-    } else {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val appOpsMgr = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
-            val mode = appOpsMgr.checkOpNoThrow(
-                "android:system_alert_window", android.os.Process.myUid(), context
-                    .packageName
-            )
-            return mode == AppOpsManager.MODE_ALLOWED || mode == AppOpsManager.MODE_IGNORED
-        } else {
-            return Settings.canDrawOverlays(context)
+fun View.extGetVisibility() = when (visibility) {
+    View.VISIBLE -> {
+        true
+    }
+    else -> {
+        false
+    }
+}
+
+//扩展函数，view隐藏
+fun View.gone() {
+    visibility = View.GONE
+}
+
+//扩展函数，view显示
+fun View.visible() {
+    visibility = View.VISIBLE
+}
+
+
+/**
+ * 设置颜色直接使用colors.xml中定义的颜色即可
+ */
+fun TextView.setColor(resId: Int) {
+    this.setTextColor(resources.getColor(resId))
+}
+
+fun View.setDrawableLeft(resId: Int) {
+    when (this) {
+        is Button -> {
+            var drawable = this.context.resources.getDrawable(resId)
+            drawable.setBounds(0, 0, drawable.minimumWidth, drawable.minimumHeight)
+            this.setCompoundDrawables(drawable, null, null, null)
+        }
+        is TextView -> {
+            var drawable = this.context.resources.getDrawable(resId)
+            drawable.setBounds(0, 0, drawable.minimumWidth, drawable.minimumHeight)
+            this.setCompoundDrawables(drawable, null, null, null)
+        }
+        else -> {
+            throw Exception("this method does not support you .")
         }
     }
+}
+
+fun TextView.setDrawableRight(resId: Int) {
+    when (this) {
+        is Button -> {
+            var drawable = this.context.resources.getDrawable(resId)
+            drawable.setBounds(0, 0, drawable.minimumWidth, drawable.minimumHeight)
+            this.setCompoundDrawables(null, null, drawable, null)
+        }
+        is TextView -> {
+            var drawable = this.context.resources.getDrawable(resId)
+            drawable.setBounds(0, 0, drawable.minimumWidth, drawable.minimumHeight)
+            this.setCompoundDrawables(null, null, drawable, null)
+        }
+        else -> {
+            throw Exception("this method does not support you .")
+        }
+    }
+
+}
+
+fun TextView.setDrawableTop(resId: Int) {
+    var drawable = this.context.resources.getDrawable(resId)
+    drawable.setBounds(0, 0, drawable.minimumWidth, drawable.minimumHeight)
+    this.setCompoundDrawables(null, drawable, null, null)
+}
+
+fun TextView.setDrawableBottom(resId: Int) {
+    var drawable = this.context.resources.getDrawable(resId)
+    drawable.setBounds(0, 0, drawable.minimumWidth, drawable.minimumHeight)
+    this.setCompoundDrawables(null, null, null, drawable)
 }
