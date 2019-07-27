@@ -130,7 +130,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
                     val act = (rtis[0].topActivity!!.packageName + "\n"
                             + rtis[0].topActivity!!.className)
                     FloatWindowService.show(act)
-                } else {
+                } else {//todo 需要添加》21的逻辑
                     FloatWindowService.show("")
                 }
             }
@@ -141,7 +141,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
             }
             ACTION_STOP -> {
                 showToast("停止")
-                FloatWindowService.dismiss()
+                FloatWindowService.stop()
                 cancelNotification(context)
             }
         }

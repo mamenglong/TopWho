@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         initView()
         NotificationActionReceiver.showNotification(this, false)
-        NotificationActionReceiver.notification(this)
+      //  NotificationActionReceiver.notification(this)
     }
 
     private fun initView() {
@@ -57,6 +57,7 @@ class MainActivity : AppCompatActivity() {
     private fun initSwitchStatus() {
         Log.i("MainActivity","initSwitchStatus")
         sw_open_accessibility_permission.isChecked = isAccessibilityServiceEnabled()
+        SP.sp.switch_open_float_permission=Settings.canDrawOverlays(this)
         if (isAccessibilityServiceEnabled()){
             btn_open_accessibility.setDrawableRight(R.drawable.ic_check_circle_48dp)
         }else{
@@ -89,6 +90,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         Log.i("MainActivity","onResume")
         initSwitchStatus()
+        supportFragmentManager.fragments[0]?.onResume()
     }
     fun checkFloatPermission(context: Context):Boolean{
         Log.i(TAG,"checkFloatPermission")

@@ -12,6 +12,7 @@ import androidx.preference.PreferenceScreen
 import androidx.preference.SwitchPreferenceCompat
 import com.mml.topwho.ConstantString
 import com.mml.topwho.R
+import com.mml.topwho.service.FloatWindowService
 import com.mml.topwho.sp.SP
 import com.mml.topwho.util.Util
 
@@ -90,6 +91,9 @@ class SwitchFragment : PreferenceFragmentCompat() {
 
         preferenceScreen.findPreference<SwitchPreferenceCompat>("switch_open_float_permission")?.isChecked=SP.sp.switch_open_float_permission
         preferenceScreen.findPreference<SwitchPreferenceCompat>("switch_open_float")?.isChecked=SP.sp.switch_open_float
+        if (SP.sp.switch_open_float){
+            FloatWindowService.start()
+        }
     }
 
     override fun onPause() {

@@ -13,6 +13,7 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Button
 import androidx.annotation.RequiresApi
+import com.mml.topwho.TopWhoApplication
 import com.mml.topwho.showToast
 import kotlin.properties.Delegates
 
@@ -165,6 +166,23 @@ class FloatWindowService : Service() {
                 showToast("悬浮窗已开启")
             }
             isShowed = true
+        }
+        fun start(){
+            Log.i("FloatWindowService", "start")
+            if (!FloatWindowService.isStarted){
+                TopWhoApplication.instances?.let{
+                    val intent=Intent(it.applicationContext,FloatWindowService::class.java)
+                    it.startService(intent)
+                    Log.i("FloatWindowService", "started")
+                }
+            }
+        }
+        fun stop(){
+            Log.i("FloatWindowService", "stop")
+            if (FloatWindowService.isStarted){
+                FloatWindowService.instances.stopSelf()
+                Log.i("FloatWindowService", "stoped")
+            }
         }
     }
 }
