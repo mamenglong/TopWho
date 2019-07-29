@@ -90,8 +90,12 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         Log.i("MainActivity","onResume")
         initSwitchStatus()
-        supportFragmentManager.fragments[0]?.onResume()
+       run {  supportFragmentManager.fragments[0] as SwitchFragment? }?.let {
+           it.updateSwitchStatus()
+       }
     }
+
+
     fun checkFloatPermission(context: Context):Boolean{
         Log.i(TAG,"checkFloatPermission")
         if (!Settings.canDrawOverlays(context)) {

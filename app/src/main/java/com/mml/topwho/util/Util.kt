@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import com.mml.topwho.ConstantString
 import com.mml.topwho.R
 import com.mml.topwho.TopWhoApplication
+import com.mml.topwho.fragment.SwitchFragment
 import com.mml.topwho.service.FloatWindowService
 import com.mml.topwho.showToast
 import com.mml.topwho.sp.SP
@@ -79,6 +80,7 @@ class Util {
           */
           fun openNoFloatPermissionDialog(fragment: Fragment){
               //没有悬浮窗权限
+              fragment as SwitchFragment
               AlertDialog.Builder(fragment.context!!)
                   .setMessage(R.string.dialog_enable_overlay_window_msg)
                   .setPositiveButton(
@@ -91,7 +93,7 @@ class Util {
                   }
                   .setNegativeButton(android.R.string.cancel) { dialog, _ ->
                       SP.sp.switch_open_float_permission=false
-                      fragment.onResume()
+                      fragment.updateSwitchStatus()
                       dialog.dismiss()
                   }
                   .setCancelable(false)

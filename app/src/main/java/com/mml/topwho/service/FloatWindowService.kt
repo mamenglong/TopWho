@@ -55,7 +55,10 @@ class FloatWindowService : Service() {
 
     override fun onDestroy() {
         logi("onDestroy")
-        windowManager!!.removeViewImmediate(button)
+        try {
+            windowManager!!.removeViewImmediate(button)
+        } catch (e: Exception) {
+        }
         isStarted = false
         super.onDestroy()
     }
@@ -63,14 +66,14 @@ class FloatWindowService : Service() {
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         logi("onStartCommand")
-        showFloatingWindow()
+        initFloatingWindow()
         isShowed = true
         instances = this
         return super.onStartCommand(intent, flags, startId)
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    private fun showFloatingWindow() {
+    private fun initFloatingWindow() {
         button = Button(applicationContext)
         button!!.apply {
             text = "TopWho Window"
@@ -82,7 +85,7 @@ class FloatWindowService : Service() {
                 setOnClickListener(it)
             }
         }
-        windowManager!!.addView(button, layoutParams)
+        addView()
     }
 
     private fun removeView() {

@@ -79,23 +79,28 @@ class SwitchFragment : PreferenceFragmentCompat() {
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    /**
-     * 手动调用
-     */
     override fun onResume() {
         super.onResume()
+        if (SP.sp.switch_open_float_permission&&SP.sp.switch_open_float){
+            FloatWindowService.start()
+        }
+    }
+    /**
+     * @Author: Menglong Ma
+     * @Email: mml2015@126.com
+     * @Date: 19-7-29 下午12:01
+     * @Description: 更新按钮状态
+     * @params []
+     * @return
+     */
+    fun updateSwitchStatus(){
         log("onResume switch_open_float_permission:${preferenceScreen.findPreference<SwitchPreferenceCompat>("switch_open_float_permission")?.isChecked}")
         log("onResume switch_open_float_permission:${ SP.sp.switch_open_float_permission}")
         log("onResume switch_open_float:${preferenceScreen.findPreference<SwitchPreferenceCompat>("switch_open_float")?.isChecked}")
         log("onResume switch_open_float:${SP.sp.switch_open_float}")
-
         preferenceScreen.findPreference<SwitchPreferenceCompat>("switch_open_float_permission")?.isChecked=SP.sp.switch_open_float_permission
         preferenceScreen.findPreference<SwitchPreferenceCompat>("switch_open_float")?.isChecked=SP.sp.switch_open_float
-        if (SP.sp.switch_open_float){
-            FloatWindowService.start()
-        }
     }
-
     override fun onPause() {
         super.onPause()
        log("onPause")
