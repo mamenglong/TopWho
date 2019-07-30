@@ -134,5 +134,16 @@ class Util {
                   }
               }
           }
+          fun getAppName( context:Context,packageName:String): String {
+             val packageManager = context.packageManager
+              val packageInfo = packageManager.getPackageInfo(
+                  packageName, 0)
+              val labelRes = packageInfo.applicationInfo.labelRes
+              return try {
+                  context.resources.getString(labelRes)
+              } catch (e: Exception) {
+                  ""
+              }
+          }
       }
 }

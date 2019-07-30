@@ -123,8 +123,8 @@ class NotificationActionReceiver : BroadcastReceiver() {
             ACTION_RESUME -> {
                 showToast("恢复")
                 showNotification(context, false)
-                val lollipop = Build.VERSION.SDK_INT >= 21
-                if (!lollipop) {
+                val lollipop = Build.VERSION.SDK_INT < 21
+                if (lollipop) {  //在5.0以下通过ActivityManager类的getRunningTasks（）获取当前打开的所有应用程序
                     val am = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
                     val rtis = am.getRunningTasks(1)
                     val act = (rtis[0].topActivity!!.packageName + "\n"

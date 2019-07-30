@@ -8,6 +8,7 @@ import android.os.Build
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import androidx.annotation.RequiresApi
+import com.mml.topwho.util.Util
 import kotlin.properties.Delegates
 
 class TopWhoAccessibilityService : AccessibilityService() {
@@ -33,8 +34,8 @@ class TopWhoAccessibilityService : AccessibilityService() {
                 Log.i(TAG, "TYPE_VIEW_CLICKED")
             }
             AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED -> {
-                val result = "${p0.packageName} \n ${p0.className} "
-                if (FloatWindowService.isStarted)
+                val result = "Name:${Util.getAppName(this,p0.packageName.toString())}\n packageName:${p0.packageName} \n className:${p0.className} "
+                if (FloatWindowService.isStarted&&FloatWindowService.isShowed)
                     FloatWindowService.setText(result)
                 Log.i(TAG, result)
             }
