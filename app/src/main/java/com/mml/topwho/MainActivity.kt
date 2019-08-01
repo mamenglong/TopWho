@@ -50,6 +50,9 @@ class MainActivity : AppCompatActivity() {
             val accessibleIntent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
             startActivity(accessibleIntent)
         }
+        app_list.setOnClickListener {
+            startActivity(Intent(this,AppListActivity::class.java))
+        }
 
     }
 

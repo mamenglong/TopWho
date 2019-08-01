@@ -44,7 +44,7 @@ class FloatWindowService : Service() {
         layoutParams!!.flags =
             WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
         layoutParams!!.width = 500
-        layoutParams!!.height = 200
+        layoutParams!!.height = 400
         layoutParams!!.x = 300
         layoutParams!!.y = 300
     }

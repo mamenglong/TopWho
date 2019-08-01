@@ -17,7 +17,7 @@
     <string name="noti_action_stop">停止</string>
 
 
-<string name="switch_float_permission">悬浮窗权限</string>
+    <string name="switch_float_permission">悬浮窗权限</string>
     <string name="switch_open_float_permission_title">打开悬浮窗权限</string>
     <string name="switch_open_float_title">打开悬浮窗</string>
     <string name="switch_open_float_summary_on">点击关闭悬浮窗</string>

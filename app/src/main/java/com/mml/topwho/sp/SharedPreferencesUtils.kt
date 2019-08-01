@@ -57,7 +57,7 @@ open class SharedPreferencesUtils(context: Context) {
 //
 //    var currentDateTime: Long by SharedPreferenceDelegates.long(System.currentTimeMillis())
 //
-//    var money by SharedPreferenceDelegates.float()
+    var money by SharedPreferenceDelegates.float()
 //
 //    var setString by SharedPreferenceDelegates.setString()
 
