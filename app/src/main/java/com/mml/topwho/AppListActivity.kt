@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jcodecraeer.xrecyclerview.XRecyclerView
 import com.mml.topwho.adapter.RecyclerViewAdapter
+import kotlinx.android.synthetic.main.activity_app_list.view.*
 
 
 class AppListActivity : AppCompatActivity() {
@@ -91,26 +92,30 @@ class AppListActivity : AppCompatActivity() {
 
         val layoutManager = LinearLayoutManager(this)
         layoutManager.orientation = RecyclerView.VERTICAL
-        mRecyclerView.layoutManager = layoutManager
-        mRecyclerView.setPullRefreshEnabled(true)
-        mRecyclerView.setRefreshProgressStyle(ProgressStyle.BallPulse)
-        mRecyclerView.setLoadingMoreProgressStyle(ProgressStyle.BallPulse)
-        mRecyclerView.setLoadingListener(object :XRecyclerView.LoadingListener{
-            override fun onLoadMore() {
-                //TODO
-                mRecyclerView.loadMoreComplete()
-                mAdapter.notifyDataSetChanged()
-               mRecyclerView.setNoMore(true)
-            }
+        with(mRecyclerView){
+            this.layoutManager = layoutManager
+            setPullRefreshEnabled(true)
+            defaultRefreshHeaderView // get default refresh header view
+                .setRefreshTimeVisible(true)  // make refresh time visible,false means hiding
+            setRefreshProgressStyle(ProgressStyle.BallPulse)
+            setLoadingMoreProgressStyle(ProgressStyle.BallPulse)
+            setLoadingListener(object :XRecyclerView.LoadingListener{
+                override fun onLoadMore() {
+                    //TODO
+                    mRecyclerView.loadMoreComplete()
+                    mAdapter.notifyDataSetChanged()
+                    mRecyclerView.setNoMore(true)
+                }
 
-            override fun onRefresh() {
-                //   TODO
-                mAdapter.notifyDataSetChanged()
-                mRecyclerView.refreshComplete()
-            }
+                override fun onRefresh() {
+                    //   TODO
+                    mAdapter.notifyDataSetChanged()
+                    mRecyclerView.refreshComplete()
+                }
 
-        })
-        mRecyclerView.addItemDecoration( DividerItemDecoration(this,DividerItemDecoration.VERTICAL))
+            })
+            addItemDecoration( DividerItemDecoration(this@AppListActivity,DividerItemDecoration.VERTICAL))
+        }
         mAdapter= RecyclerViewAdapter(dataList)
         mRecyclerView.adapter=mAdapter
     }
