@@ -2,17 +2,16 @@ package com.mml.topwho
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
+import android.os.AsyncTask
 import android.os.Bundle
 import android.view.MenuItem
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.mml.topwho.data.AppInfo
 import kotlinx.android.synthetic.main.activity_app_list.*
 import com.jcodecraeer.xrecyclerview.ProgressStyle
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jcodecraeer.xrecyclerview.XRecyclerView
@@ -21,37 +20,27 @@ import kotlinx.android.synthetic.main.activity_app_list.view.*
 
 
 class AppListActivity : AppCompatActivity() {
-    lateinit var listApplicationInfo:List<ApplicationInfo>
-    lateinit var listPackageInfo:List<PackageInfo>
-    private val dataList= mutableListOf<AppInfo>()
-    private lateinit var mAdapter:RecyclerViewAdapter
-    private lateinit var textMessage: TextView
+    lateinit var listApplicationInfo: List<ApplicationInfo>
+    lateinit var listPackageInfo: List<PackageInfo>
+    private val originDataList = mutableListOf<AppInfo>()
+    private val dataSystemList = mutableListOf<AppInfo>()
+    private val dataUserList = mutableListOf<AppInfo>()
+    private val dataList = mutableListOf<AppInfo>()
+    private lateinit var mAdapter: RecyclerViewAdapter
+    lateinit var navView: BottomNavigationView
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         val fragment: Fragment? = null
-        when (item.itemId) {
-            R.id.navigation_home -> {
-                textMessage.setText(R.string.title_home)
-                return@OnNavigationItemSelectedListener true
-            }
-            R.id.navigation_dashboard -> {
-                textMessage.setText(R.string.title_dashboard)
-                return@OnNavigationItemSelectedListener true
-            }
-            R.id.navigation_notifications -> {
-                textMessage.setText(R.string.title_notifications)
-                return@OnNavigationItemSelectedListener true
-            }
-//            return@OnNavigationItemSelectedListener loadFragment(fragment)
-        }
-        false
+        notifyDataSetChanged(item)
+        true
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_app_list)
-        initData()
+//        initData()
+        navView = findViewById(R.id.nav_view)
         initView()
-
+        AppListTask().execute()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -63,9 +52,20 @@ class AppListActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
-    private fun initData(){
-        listApplicationInfo=packageManager.getInstalledApplications(0)
-        listPackageInfo=packageManager.getInstalledPackages(0)
+    /**
+     * @method:initData
+     * @author: Created by Menglong Ma
+     * @email：mml2015@126.com
+     * @date: 2019/8/3 23:02.
+     * @parameters:
+     * @description: 初始化
+     */
+    private fun initData() {
+        originDataList.clear()
+        dataUserList.clear()
+        dataSystemList.clear()
+        listApplicationInfo = packageManager.getInstalledApplications(0)
+        listPackageInfo = packageManager.getInstalledPackages(0)
         listPackageInfo.forEach {
             with(it) {
                 val appName = applicationInfo.loadLabel(packageManager).toString()
@@ -73,61 +73,153 @@ class AppListActivity : AppCompatActivity() {
                 val versionName = versionName
                 val versionCode = versionCode
                 val icon = it.applicationInfo.loadIcon(packageManager)
-                dataList.add(AppInfo(appName,packageName,versionName,versionCode,icon))
+                val flag = (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
+                originDataList.add(AppInfo(appName, packageName, versionName, versionCode, icon, flag))
             }
         }
-        if (listPackageInfo[1].applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM == 0) {
-            //非系统应用
-
-        } else {    //系统应用
-
-        }
+        dataUserList.addAll(originDataList.filter { !it.isSystemApp })
+        dataSystemList.addAll(originDataList.filter { it.isSystemApp })
     }
-    private fun initView(){
+    /**
+     * @method: notifyDataSetChanged
+     * @author: Created by Menglong Ma
+     * @email：mml2015@126.com
+     * @date: 2019/8/3 23:01.
+     * @parameters: [item]
+     * @description: 根据 bottom 选择更新数据
+     */
+    private fun notifyDataSetChanged(item: MenuItem) {
+        when (item.itemId) {
+            R.id.navigation_home -> {
+                dataList.clear()
+                dataList.apply {
+                    addAll(originDataList)
+                    sortByDescending { it.appName }
+                }
+                showToast("共有${originDataList.size}个app")
+            }
+            R.id.navigation_user -> {
+                dataList.clear()
+                dataList.apply{
+                    addAll(dataUserList)
+                    sortByDescending { it.appName }
+                }
+                    showToast("用户有${dataUserList.size}个app")
+            }
+            R.id.navigation_system -> {
+                dataList.clear()
+                dataList.apply {
+                    addAll(dataSystemList)
+                    sortByDescending { it.appName }
+                }
+                showToast("系统有${dataSystemList.size}个app")
+            }
+        }
+        mAdapter.notifyDataSetChanged()
+    }
+
+    private fun initView() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
-
-        textMessage = findViewById(R.id.message)
         nav_view.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
-
         val layoutManager = LinearLayoutManager(this)
         layoutManager.orientation = RecyclerView.VERTICAL
-        with(mRecyclerView){
+        with(mRecyclerView) {
             this.layoutManager = layoutManager
-            setPullRefreshEnabled(true)
+//            setPullRefreshEnabled(true)
             defaultRefreshHeaderView // get default refresh header view
                 .setRefreshTimeVisible(true)  // make refresh time visible,false means hiding
-            setRefreshProgressStyle(ProgressStyle.BallPulse)
-            setLoadingMoreProgressStyle(ProgressStyle.BallPulse)
-            setLoadingListener(object :XRecyclerView.LoadingListener{
+            setRefreshProgressStyle(ProgressStyle.BallPulseRise)
+            setLoadingMoreProgressStyle(ProgressStyle.BallBeat)
+//            setLimitNumberToCallLoadMore(10)
+            setLoadingListener(object : XRecyclerView.LoadingListener {
                 override fun onLoadMore() {
-                    //TODO
+                    /*           when (navView.selectedItemId) {
+                                   R.id.navigation_home -> {
+                                       if (dataList.size <= originDataList.size) {
+                                           dataList.addAll(originDataList.subList(dataList.size - 1, dataList.size + 10))
+                                       } else {
+                                           mRecyclerView.setNoMore(true)
+                                       }
+                                   }
+                                   R.id.navigation_system -> {
+                                       if (dataList.size <= dataSystemList.size) {
+                                           dataList.addAll(dataSystemList.subList(dataList.size - 1, dataList.size + 10))
+                                       } else {
+                                           mRecyclerView.setNoMore(true)
+                                       }
+                                   }
+                                   R.id.navigation_user -> {
+                                       if (dataList.size <= dataUserList.size) {
+                                           dataList.addAll(dataUserList.subList(dataList.size - 1, dataList.size + 10))
+                                       } else {
+                                           mRecyclerView.setNoMore(true)
+                                       }
+                                   }
+                               }*/
+                    mRecyclerView.setNoMore(true)
                     mRecyclerView.loadMoreComplete()
                     mAdapter.notifyDataSetChanged()
-                    mRecyclerView.setNoMore(true)
                 }
 
                 override fun onRefresh() {
-                    //   TODO
+                    dataList.clear()
+                    when (navView.selectedItemId) {
+                        R.id.navigation_home -> {
+                            dataList.addAll(originDataList)
+                        }
+                        R.id.navigation_system -> {
+                            dataList.addAll(dataSystemList)
+                        }
+                        R.id.navigation_user -> {
+                            dataList.addAll(dataUserList)
+                        }
+                    }
                     mAdapter.notifyDataSetChanged()
                     mRecyclerView.refreshComplete()
                 }
 
             })
-            addItemDecoration( DividerItemDecoration(this@AppListActivity,DividerItemDecoration.VERTICAL))
+            addItemDecoration(DividerItemDecoration(this@AppListActivity, DividerItemDecoration.VERTICAL))
         }
-        mAdapter= RecyclerViewAdapter(dataList)
-        mRecyclerView.adapter=mAdapter
+        mAdapter = RecyclerViewAdapter(dataList)
+        mRecyclerView.adapter = mAdapter
     }
+
     private fun loadFragment(fragment: Fragment?): Boolean {
         //switching fragment
         if (fragment != null) {
             supportFragmentManager
                 .beginTransaction()
-                .replace(R.id.fragment_container, fragment)
+//                .replace(R.id.fragment_container, fragment)
                 .commit()
             return true
         }
         return false
+    }
+
+    inner class AppListTask : AsyncTask<Any?, Int, Boolean>() {
+
+        override fun onPreExecute() {
+            super.onPreExecute()
+            progressBar.visible()
+
+        }
+
+        override fun doInBackground(vararg p0: Any?): Boolean {
+            initData()
+            return true
+        }
+
+        override fun onPostExecute(result: Boolean?) {
+//            super.onPostExecute(result)
+            if (result!!) {
+                progressBar.gone()
+                mRecyclerView.refresh()
+            } else {
+                showToast("加载失败！")
+            }
+        }
+
     }
 }

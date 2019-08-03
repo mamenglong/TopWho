@@ -28,10 +28,15 @@ class RecyclerViewAdapter(val data:List<AppInfo>): RecyclerView.Adapter<Recycler
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.text.text= data[position].appName
+        with(data[position]) {
+            holder.itemView.app_name.text=appName
+            holder.itemView.app_icon.setImageDrawable(appIcon)
+            holder.itemView.app_package_name.text=packageName
+            versionName
+        }
     }
 
     class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-        val text=itemView.text
+
     }
 }

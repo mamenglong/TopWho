@@ -23,7 +23,7 @@
     <string name="switch_open_float_summary_on">点击关闭悬浮窗</string>
     <string name="switch_open_float_summary_off">点击显示悬浮窗</string>
     <string name="title_activity_app_list">AppListActivity</string>
-    <string name="title_home">Home</string>
-    <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_home">所有应用</string>
+    <string name="title_dashboard">系统应用</string>
+    <string name="title_notifications">我的应用</string>
 </resources>
