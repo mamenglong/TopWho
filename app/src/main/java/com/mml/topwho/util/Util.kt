@@ -138,9 +138,8 @@ class Util {
              val packageManager = context.packageManager
               val packageInfo = packageManager.getPackageInfo(
                   packageName, 0)
-              val labelRes = packageInfo.applicationInfo.labelRes
               return try {
-                  context.resources.getString(labelRes)
+                  packageInfo.applicationInfo.loadLabel(packageManager).toString()
               } catch (e: Exception) {
                   ""
               }
