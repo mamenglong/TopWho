@@ -71,11 +71,15 @@ class AppListActivity : AppCompatActivity() {
                 val appName = applicationInfo.loadLabel(packageManager).toString()
                 val packageName = packageName
                 val versionName = versionName
+                val className=applicationInfo.className
                 val versionCode = versionCode
                 val icon = it.applicationInfo.loadIcon(packageManager)
                 val flag = (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
-                originDataList.add(AppInfo(appName, packageName, versionName, versionCode, icon, flag))
+                originDataList.add(AppInfo(appName, packageName, versionName,className,versionCode, icon, flag))
             }
+        }
+        originDataList.sortByDescending {
+            it.appName
         }
         dataUserList.addAll(originDataList.filter { !it.isSystemApp })
         dataSystemList.addAll(originDataList.filter { it.isSystemApp })
@@ -94,7 +98,6 @@ class AppListActivity : AppCompatActivity() {
                 dataList.clear()
                 dataList.apply {
                     addAll(originDataList)
-                    sortByDescending { it.appName }
                 }
                 showToast("共有${originDataList.size}个app")
             }
@@ -102,7 +105,6 @@ class AppListActivity : AppCompatActivity() {
                 dataList.clear()
                 dataList.apply{
                     addAll(dataUserList)
-                    sortByDescending { it.appName }
                 }
                     showToast("用户有${dataUserList.size}个app")
             }
@@ -110,7 +112,6 @@ class AppListActivity : AppCompatActivity() {
                 dataList.clear()
                 dataList.apply {
                     addAll(dataSystemList)
-                    sortByDescending { it.appName }
                 }
                 showToast("系统有${dataSystemList.size}个app")
             }

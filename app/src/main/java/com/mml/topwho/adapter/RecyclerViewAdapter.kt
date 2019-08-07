@@ -32,6 +32,7 @@ class RecyclerViewAdapter(val data:List<AppInfo>): RecyclerView.Adapter<Recycler
             holder.itemView.app_name.text=appName
             holder.itemView.app_icon.setImageDrawable(appIcon)
             holder.itemView.app_package_name.text=packageName
+            holder.itemView.app_class_name.text=className
             versionName
         }
     }

@@ -10,4 +10,12 @@ import android.graphics.drawable.Drawable
  * Package: com.mml.topwho.data
  * Project: TopWho
  */
-data class AppInfo(var appName:String?="",var packageName:String?="",var versionName:String?="",var versionCode:Int?=0,var appIcon:Drawable?=null ,var isSystemApp:Boolean=false)
+data class AppInfo(
+    var appName: String? = "",
+    var packageName: String? = "",
+    var versionName: String? = "",
+    var className:String?="",
+    var versionCode: Int? = 0,
+    var appIcon: Drawable? = null,
+    var isSystemApp: Boolean = false
+)
