@@ -11,13 +11,18 @@ import androidx.core.content.ContextCompat.getSystemService
 import android.os.Build
 import android.os.Binder.getCallingUid
 import android.provider.Settings
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import java.lang.reflect.AccessibleObject.setAccessible
 
 
-
+ fun log(tag:String?="Log",msg: String){
+     if (BuildConfig.DEBUG){
+         Log.i(tag,msg)
+     }
+ }
 
 fun showToast(msg:String)= run {
     val looper=Looper.getMainLooper()

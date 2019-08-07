@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.jcodecraeer.xrecyclerview.XRecyclerView
 import com.mml.topwho.adapter.RecyclerViewAdapter
 import kotlinx.android.synthetic.main.activity_app_list.view.*
+import kotlin.math.ceil
 
 
 class AppListActivity : AppCompatActivity() {
@@ -28,6 +29,9 @@ class AppListActivity : AppCompatActivity() {
     private val dataList = mutableListOf<AppInfo>()
     private lateinit var mAdapter: RecyclerViewAdapter
     lateinit var navView: BottomNavigationView
+    var ALLPAGES:Int = 0
+    var CURRENTPAGE=0
+    var PAGE_SIZE=10.0
     private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         val fragment: Fragment? = null
         notifyDataSetChanged(item)
@@ -81,6 +85,9 @@ class AppListActivity : AppCompatActivity() {
         originDataList.sortByDescending {
             it.appName
         }
+        ALLPAGES= ceil(originDataList.size/PAGE_SIZE).toInt()
+        CURRENTPAGE=0
+        log(msg="ALLPAGES:$ALLPAGES  PAGESIZE:$PAGE_SIZE ALL:${originDataList.size}")
         dataUserList.addAll(originDataList.filter { !it.isSystemApp })
         dataSystemList.addAll(originDataList.filter { it.isSystemApp })
     }
@@ -96,6 +103,8 @@ class AppListActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.navigation_home -> {
                 dataList.clear()
+                ALLPAGES= ceil(originDataList.size/PAGE_SIZE).toInt()
+                CURRENTPAGE=0
                 dataList.apply {
                     addAll(originDataList)
                 }
@@ -103,6 +112,8 @@ class AppListActivity : AppCompatActivity() {
             }
             R.id.navigation_user -> {
                 dataList.clear()
+                ALLPAGES= ceil(dataUserList.size/PAGE_SIZE).toInt()
+                CURRENTPAGE=0
                 dataList.apply{
                     addAll(dataUserList)
                 }
@@ -110,6 +121,8 @@ class AppListActivity : AppCompatActivity() {
             }
             R.id.navigation_system -> {
                 dataList.clear()
+                ALLPAGES= ceil(dataSystemList.size/PAGE_SIZE).toInt()
+                CURRENTPAGE=0
                 dataList.apply {
                     addAll(dataSystemList)
                 }
@@ -126,6 +139,8 @@ class AppListActivity : AppCompatActivity() {
         val layoutManager = LinearLayoutManager(this)
         layoutManager.orientation = RecyclerView.VERTICAL
         with(mRecyclerView) {
+            this.setFootViewText("正在努力加载中","没有更多啦!")
+            this.defaultFootView.setLoadingDoneHint("加载完成啦!")
             this.layoutManager = layoutManager
 //            setPullRefreshEnabled(true)
             defaultRefreshHeaderView // get default refresh header view

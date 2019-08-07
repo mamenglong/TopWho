@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import com.mml.topwho.R
 import com.mml.topwho.data.AppInfo
 import kotlinx.android.synthetic.main.item_recycler_view.view.*
+import kotlin.math.ceil
 
 
 /**
@@ -17,7 +18,13 @@ import kotlinx.android.synthetic.main.item_recycler_view.view.*
  * Package: com.mml.topwho.adapter
  * Project: TopWho
  */
-class RecyclerViewAdapter(val data:List<AppInfo>): RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
+class RecyclerViewAdapter(private val data:List<AppInfo>): RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
+    private var PAGE:Int=0
+    private var PAGE_SIZE=10.0
+    init {
+        val result= data.size/PAGE_SIZE
+        PAGE=ceil(result).toInt()
+    }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_recycler_view, parent, false)
         return ViewHolder(view)
@@ -26,7 +33,6 @@ class RecyclerViewAdapter(val data:List<AppInfo>): RecyclerView.Adapter<Recycler
     override fun getItemCount(): Int {
         return data.size
     }
-
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         with(data[position]) {
             holder.itemView.app_name.text=appName
