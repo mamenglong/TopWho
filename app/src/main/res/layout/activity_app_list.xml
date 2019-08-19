@@ -20,10 +20,20 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>
+        <androidx.recyclerview.widget.RecyclerView
+                tools:itemCount="8"
+                tools:listitem="@layout/item_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+        </androidx.recyclerview.widget.RecyclerView>
         <com.jcodecraeer.xrecyclerview.XRecyclerView
                 android:id="@+id/mRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                tools:itemCount="8"
+           
+                tools:listitem="@layout/item_recycler_view"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/nav_view">
 

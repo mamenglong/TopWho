@@ -2,38 +2,39 @@
 <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-       android:padding="5dp"
->
-    <ImageView android:layout_width="48dp"
+        android:layout_height="80dp"
+        android:padding="5dp">
+    <ImageView android:layout_width="60dp"
+               android:id="@+id/app_icon"
+               android:layout_height="60dp"
                app:layout_constraintStart_toStartOf="parent"
                app:layout_constraintTop_toTopOf="parent"
-               android:id="@+id/app_icon"
-               android:scaleType="centerCrop"
                app:layout_constraintBottom_toBottomOf="parent"
-               android:layout_height="48dp"/>
+               android:scaleType="centerCrop"
+               tools:srcCompat="@drawable/ic_user_black_24dp"/>
     <TextView android:layout_width="wrap_content"
               android:id="@+id/app_name"
+              android:layout_height="wrap_content"
               app:layout_constraintVertical_chainStyle="spread_inside"
               app:layout_constraintStart_toEndOf="@id/app_icon"
               app:layout_constraintTop_toTopOf="parent"
               app:layout_constraintBottom_toTopOf="@id/app_package_name"
-              android:layout_height="wrap_content"
-              android:text="aaaaaaa"/>
+              tools:text="@tools:sample/first_names"/>
     <TextView android:layout_width="wrap_content"
               android:id="@+id/app_package_name"
-              android:text="sssss"
+              android:layout_height="wrap_content"
+              app:layout_constraintStart_toStartOf="@id/app_name"
               app:layout_constraintTop_toBottomOf="@id/app_name"
-              app:layout_constraintStart_toStartOf="@id/app_name"
               app:layout_constraintBottom_toTopOf="@id/app_class_name"
-              android:layout_height="wrap_content"/>
+              tools:text="@tools:sample/last_names"/>
     <TextView android:layout_width="wrap_content"
-              app:layout_constraintTop_toBottomOf="@id/app_package_name"
               android:id="@+id/app_class_name"
-              android:text="ssssss"
+              android:layout_height="wrap_content"
               app:layout_constraintStart_toStartOf="@id/app_name"
+              app:layout_constraintTop_toBottomOf="@id/app_package_name"
               app:layout_constraintBottom_toBottomOf="parent"
-              android:layout_height="wrap_content"/>
+              tools:text="@tools:sample/cities"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

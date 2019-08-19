@@ -16,16 +16,19 @@ import com.mml.topwho.receiver.NotificationActionReceiver
 import com.mml.topwho.service.FloatWindowService
 import com.mml.topwho.sp.SP
 import kotlinx.android.synthetic.main.activity_main.*
+import tyrantgit.explosionfield.ExplosionField
 
 
 class MainActivity : AppCompatActivity() {
     val sp by lazy { SP(this) }
     val TAG="MainActivity"
+   lateinit var  mExplosionField:ExplosionField
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initView()
         NotificationActionReceiver.showNotification(this, false)
+        mExplosionField=ExplosionField.attach2Window(this);
       //  NotificationActionReceiver.notification(this)
     }
 
@@ -51,6 +54,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(accessibleIntent)
         }
         app_list.setOnClickListener {
+//            mExplosionField.explode(it)
             startActivity(Intent(this,AppListActivity::class.java))
         }
 
