@@ -77,12 +77,12 @@ class FloatWindowService : Service() {
         button = Button(applicationContext)
         button!!.apply {
             text = "TopWho Window"
-            setBackgroundColor(Color.TRANSPARENT)
+            setBackgroundColor(Color.argb(128,255,255,255))
             textSize = 10f
             isAllCaps = false
             FloatingListener().let {
                 setOnTouchListener(it)
-                setOnClickListener(it)
+//                setOnClickListener(it)
             }
         }
         addView()
@@ -98,12 +98,13 @@ class FloatWindowService : Service() {
         logi("addView:$button")
     }
 
-    private inner class FloatingListener : View.OnTouchListener, View.OnClickListener {
-        override fun onClick(p0: View?) {
+    private inner class FloatingListener : View.OnTouchListener{//, View.OnClickListener {
+/*        override fun onClick(p0: View?) {
+
             logi("onClick")
 //            val accessibleIntent =  Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
 //            startActivity(accessibleIntent)
-        }
+        }*/
 
         private var x: Int = 0
         private var y: Int = 0
