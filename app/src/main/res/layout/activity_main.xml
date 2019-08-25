@@ -60,7 +60,7 @@
             android:text="悬浮窗"/>
     <Button android:layout_width="match_parent"
             android:id="@+id/app_list"
-            android:text="APP列表"
+            android:text="APP包名查看"
             android:background="@drawable/btn_bg"
             app:layout_constraintBottom_toBottomOf="parent"
             android:layout_height="wrap_content"/>

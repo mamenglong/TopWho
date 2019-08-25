@@ -75,7 +75,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
                         context.getString(R.string.app_name)
                     )
                 )
-                .setSmallIcon(R.drawable.ic_launcher_background)
+                .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentText(context.getString(R.string.touch_to_open))
                 .setColor(-0x1dea20)
                 .setVisibility(NotificationCompat.VISIBILITY_SECRET)
