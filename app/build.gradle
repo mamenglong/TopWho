@@ -40,4 +40,8 @@ dependencies {
     implementation 'com.jcodecraeer:xrecyclerview:1.5.9'
 //    implementation 'com.github.tbruyelle:rxpermissions:0.10.2'
 //    implementation 'io.reactivex.rxjava2:rxjava:2.2.2'
+
+    //umeng
+    implementation  'com.umeng.umsdk:analytics:8.0.0'
+    implementation  'com.umeng.umsdk:common:2.0.0'
 }
