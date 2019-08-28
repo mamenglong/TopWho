@@ -16,6 +16,8 @@
             tools:ignore="GoogleAppIndexingWarning">
         <activity
                 android:name=".AppListActivity"
+                android:launchMode="singleTask"
+                android:screenOrientation="portrait"
                 android:label="@string/title_activity_app_list">
         </activity>
         <activity android:name=".MainActivity">

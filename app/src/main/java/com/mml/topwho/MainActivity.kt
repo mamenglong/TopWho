@@ -15,8 +15,11 @@ import com.mml.topwho.fragment.SwitchFragment
 import com.mml.topwho.receiver.NotificationActionReceiver
 import com.mml.topwho.service.FloatWindowService
 import com.mml.topwho.sp.SP
+import com.umeng.analytics.MobclickAgent
 import kotlinx.android.synthetic.main.activity_main.*
 import tyrantgit.explosionfield.ExplosionField
+import java.util.HashMap
+import kotlin.time.MonoClock
 
 
 class MainActivity : AppCompatActivity() {
@@ -28,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         initView()
         NotificationActionReceiver.showNotification(this, false)
-        mExplosionField=ExplosionField.attach2Window(this);
+        mExplosionField=ExplosionField.attach2Window(this)
       //  NotificationActionReceiver.notification(this)
     }
 
@@ -55,6 +58,9 @@ class MainActivity : AppCompatActivity() {
         }
         app_list.setOnClickListener {
 //            mExplosionField.explode(it)
+           /* val map = HashMap<String, String>(1)
+            map[UmengEvent.OPEN_APPLICATION_LIST] = ""*/
+            MobclickAgent.onEvent(this, UmengEvent.OPEN_APPLICATION_LIST)
             startActivity(Intent(this,AppListActivity::class.java))
         }
 
