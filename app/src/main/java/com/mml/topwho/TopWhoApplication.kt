@@ -39,8 +39,8 @@ class TopWhoApplication: Application() {
          * 子进程是否支持自定义事件统计。
          * 参数：boolean 默认不使用
          */
-        UMConfigure. setProcessEvent(false)
+        UMConfigure. setProcessEvent(true)
         // 选用AUTO页面采集模式
-        MobclickAgent.setPageCollectionMode(MobclickAgent.PageMode.AUTO)
+        MobclickAgent.setPageCollectionMode(MobclickAgent.PageMode.MANUAL)
     }
 }

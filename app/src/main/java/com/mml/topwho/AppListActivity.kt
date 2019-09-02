@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.jcodecraeer.xrecyclerview.XRecyclerView
 import com.mml.topwho.adapter.RecyclerViewAdapter
+import com.umeng.analytics.MobclickAgent
 import kotlinx.android.synthetic.main.activity_app_list.view.*
 import kotlin.math.ceil
 
@@ -48,6 +49,14 @@ class AppListActivity : AppCompatActivity() {
         AppListTask().execute()
     }
 
+    override fun onResume() {
+        super.onResume()
+        MobclickAgent.onResume(this)
+    }
+    override fun onPause() {
+        super.onPause()
+        MobclickAgent.onPause(this)
+    }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {

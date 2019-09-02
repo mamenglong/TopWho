@@ -101,6 +101,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        MobclickAgent.onResume(this)
         Log.i("MainActivity","onResume")
         initSwitchStatus()
        run {  supportFragmentManager.fragments[0] as SwitchFragment? }?.let {
@@ -108,6 +109,10 @@ class MainActivity : AppCompatActivity() {
        }
     }
 
+    override fun onPause() {
+        super.onPause()
+        MobclickAgent.onPause(this)
+    }
 
     fun checkFloatPermission(context: Context):Boolean{
         Log.i(TAG,"checkFloatPermission")
