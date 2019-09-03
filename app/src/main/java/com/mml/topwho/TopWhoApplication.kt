@@ -17,6 +17,11 @@ class TopWhoApplication: Application() {
 
     private fun initUmeng(){
         /**
+         * 设置组件化的Log开关
+         * 参数: boolean 默认为false，如需查看LOG设置为true
+         */
+        UMConfigure.setLogEnabled(BuildConfig.DEBUG)
+        /**
          * 初始化common库
          * 参数1:上下文，不能为空
          * 参数2:【友盟+】 AppKey
@@ -25,11 +30,7 @@ class TopWhoApplication: Application() {
          * 参数5:Push推送业务的secret
          */
         UMConfigure.init(this, "5d665603570df35b86000563", "Once", UMConfigure.DEVICE_TYPE_PHONE,null)
-        /**
-         * 设置组件化的Log开关
-         * 参数: boolean 默认为false，如需查看LOG设置为true
-         */
-        UMConfigure.setLogEnabled(BuildConfig.DEBUG)
+
         /**
          * 设置日志加密
          * 参数：boolean 默认为false（不加密）

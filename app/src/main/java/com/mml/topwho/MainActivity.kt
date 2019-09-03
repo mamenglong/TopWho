@@ -16,10 +16,15 @@ import com.mml.topwho.receiver.NotificationActionReceiver
 import com.mml.topwho.service.FloatWindowService
 import com.mml.topwho.sp.SP
 import com.umeng.analytics.MobclickAgent
+import com.umeng.commonsdk.statistics.common.DeviceConfig
 import kotlinx.android.synthetic.main.activity_main.*
 import tyrantgit.explosionfield.ExplosionField
 import java.util.HashMap
 import kotlin.time.MonoClock
+import androidx.core.app.ComponentActivity.ExtraData
+import androidx.core.content.ContextCompat.getSystemService
+
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -34,7 +39,6 @@ class MainActivity : AppCompatActivity() {
         mExplosionField=ExplosionField.attach2Window(this)
       //  NotificationActionReceiver.notification(this)
     }
-
     private fun initView() {
         supportFragmentManager
             .beginTransaction()
