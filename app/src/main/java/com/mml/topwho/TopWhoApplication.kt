@@ -42,5 +42,6 @@ class TopWhoApplication: Application() {
         UMConfigure. setProcessEvent(true)
         // 选用AUTO页面采集模式
         MobclickAgent.setPageCollectionMode(MobclickAgent.PageMode.MANUAL)
+
     }
 }

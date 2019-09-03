@@ -2,9 +2,12 @@ package com.mml.topwho
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
+import android.graphics.Canvas
+import android.graphics.Rect
 import android.os.AsyncTask
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -149,13 +152,30 @@ class AppListActivity : AppCompatActivity() {
         val layoutManager = LinearLayoutManager(this)
         layoutManager.orientation = RecyclerView.VERTICAL
         with(mRecyclerView) {
-            this.setFootViewText("正在努力加载中","没有更多啦!")
-            this.defaultFootView.setLoadingDoneHint("加载完成啦!")
+            setFootViewText("正在努力加载中","没有更多啦!")
+            defaultFootView.setLoadingDoneHint("加载完成啦!")
             this.layoutManager = layoutManager
-//            setPullRefreshEnabled(true)
+//            addItemDecoration(DividerItemDecoration(this@AppListActivity, DividerItemDecoration.VERTICAL))
+            addItemDecoration(object : RecyclerView.ItemDecoration() {
+                fun convertDpToPixel(dp: Int): Int {
+                    val displayMetrics = resources.displayMetrics
+                    return (dp * displayMetrics.density).toInt()
+                }
+
+                override fun getItemOffsets(
+                    outRect: Rect,
+                    view: View,
+                    parent: RecyclerView,
+                    state: RecyclerView.State
+                ) {
+                    outRect.top = convertDpToPixel(5)
+                }
+            })
+            setPullRefreshEnabled(true)
+            setLoadingMoreEnabled(true)
             defaultRefreshHeaderView // get default refresh header view
                 .setRefreshTimeVisible(true)  // make refresh time visible,false means hiding
-            setRefreshProgressStyle(ProgressStyle.BallPulseRise)
+            setRefreshProgressStyle(ProgressStyle.BallPulseSync)
             setLoadingMoreProgressStyle(ProgressStyle.BallBeat)
 //            setLimitNumberToCallLoadMore(10)
             setLoadingListener(object : XRecyclerView.LoadingListener {
@@ -201,12 +221,13 @@ class AppListActivity : AppCompatActivity() {
                             dataList.addAll(dataUserList)
                         }
                     }
+                    mRecyclerView.setNoMore(true)
                     mAdapter.notifyDataSetChanged()
                     mRecyclerView.refreshComplete()
                 }
 
             })
-            addItemDecoration(DividerItemDecoration(this@AppListActivity, DividerItemDecoration.VERTICAL))
+
         }
         mAdapter = RecyclerViewAdapter(dataList)
         mRecyclerView.adapter = mAdapter
