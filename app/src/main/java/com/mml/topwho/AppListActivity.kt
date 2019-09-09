@@ -2,24 +2,22 @@ package com.mml.topwho
 
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
-import android.graphics.Canvas
 import android.graphics.Rect
 import android.os.AsyncTask
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.DividerItemDecoration
-import com.mml.topwho.data.AppInfo
-import kotlinx.android.synthetic.main.activity_app_list.*
-import com.jcodecraeer.xrecyclerview.ProgressStyle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.jcodecraeer.xrecyclerview.ProgressStyle
 import com.jcodecraeer.xrecyclerview.XRecyclerView
 import com.mml.topwho.adapter.RecyclerViewAdapter
+import com.mml.topwho.data.AppInfo
 import com.umeng.analytics.MobclickAgent
+import kotlinx.android.synthetic.main.activity_app_list.*
 import kotlinx.android.synthetic.main.activity_app_list.view.*
 import kotlin.math.ceil
 
@@ -33,14 +31,15 @@ class AppListActivity : AppCompatActivity() {
     private val dataList = mutableListOf<AppInfo>()
     private lateinit var mAdapter: RecyclerViewAdapter
     lateinit var navView: BottomNavigationView
-    var ALLPAGES:Int = 0
-    var CURRENTPAGE=0
-    var PAGE_SIZE=10.0
-    private val onNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
-        val fragment: Fragment? = null
-        notifyDataSetChanged(item)
-        true
-    }
+    var ALLPAGES: Int = 0
+    var CURRENTPAGE = 0
+    var PAGE_SIZE = 10.0
+    private val onNavigationItemSelectedListener =
+        BottomNavigationView.OnNavigationItemSelectedListener { item ->
+            val fragment: Fragment? = null
+            notifyDataSetChanged(item)
+            true
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,10 +55,12 @@ class AppListActivity : AppCompatActivity() {
         super.onResume()
         MobclickAgent.onResume(this)
     }
+
     override fun onPause() {
         super.onPause()
         MobclickAgent.onPause(this)
     }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
@@ -69,6 +70,7 @@ class AppListActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
+
     /**
      * @method:initData
      * @author: Created by Menglong Ma
@@ -88,22 +90,43 @@ class AppListActivity : AppCompatActivity() {
                 val appName = applicationInfo.loadLabel(packageManager).toString()
                 val packageName = packageName
                 val versionName = versionName
-                val className=applicationInfo.className
+                val className = applicationInfo.className
                 val versionCode = versionCode
                 val icon = it.applicationInfo.loadIcon(packageManager)
                 val flag = (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
-                originDataList.add(AppInfo(appName, packageName, versionName,className,versionCode, icon, flag))
+                val minSdkVersion = applicationInfo.minSdkVersion
+                val targetSdkVersion = applicationInfo.targetSdkVersion
+                val sourcePath = applicationInfo.sourceDir
+                val dataDir = applicationInfo.dataDir
+                val sourceDir = applicationInfo.sourceDir
+                originDataList.add(
+                    AppInfo(
+                        appName,
+                        packageName,
+                        versionName,
+                        className,
+                        versionCode,
+                        icon,
+                        flag,
+                        minSdkVersion,
+                        targetSdkVersion,
+                        sourcePath,
+                        dataDir,
+                        sourceDir
+                    )
+                )
             }
         }
         originDataList.sortByDescending {
             it.appName
         }
-        ALLPAGES= ceil(originDataList.size/PAGE_SIZE).toInt()
-        CURRENTPAGE=0
-        log(msg="ALLPAGES:$ALLPAGES  PAGESIZE:$PAGE_SIZE ALL:${originDataList.size}")
+        ALLPAGES = ceil(originDataList.size / PAGE_SIZE).toInt()
+        CURRENTPAGE = 0
+        log(msg = "ALLPAGES:$ALLPAGES  PAGESIZE:$PAGE_SIZE ALL:${originDataList.size}")
         dataUserList.addAll(originDataList.filter { !it.isSystemApp })
         dataSystemList.addAll(originDataList.filter { it.isSystemApp })
     }
+
     /**
      * @method: notifyDataSetChanged
      * @author: Created by Menglong Ma
@@ -116,8 +139,8 @@ class AppListActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.navigation_home -> {
                 dataList.clear()
-                ALLPAGES= ceil(originDataList.size/PAGE_SIZE).toInt()
-                CURRENTPAGE=0
+                ALLPAGES = ceil(originDataList.size / PAGE_SIZE).toInt()
+                CURRENTPAGE = 0
                 dataList.apply {
                     addAll(originDataList)
                 }
@@ -125,17 +148,17 @@ class AppListActivity : AppCompatActivity() {
             }
             R.id.navigation_user -> {
                 dataList.clear()
-                ALLPAGES= ceil(dataUserList.size/PAGE_SIZE).toInt()
-                CURRENTPAGE=0
-                dataList.apply{
+                ALLPAGES = ceil(dataUserList.size / PAGE_SIZE).toInt()
+                CURRENTPAGE = 0
+                dataList.apply {
                     addAll(dataUserList)
                 }
-                    showToast("用户有${dataUserList.size}个app")
+                showToast("用户有${dataUserList.size}个app")
             }
             R.id.navigation_system -> {
                 dataList.clear()
-                ALLPAGES= ceil(dataSystemList.size/PAGE_SIZE).toInt()
-                CURRENTPAGE=0
+                ALLPAGES = ceil(dataSystemList.size / PAGE_SIZE).toInt()
+                CURRENTPAGE = 0
                 dataList.apply {
                     addAll(dataSystemList)
                 }
@@ -152,7 +175,7 @@ class AppListActivity : AppCompatActivity() {
         val layoutManager = LinearLayoutManager(this)
         layoutManager.orientation = RecyclerView.VERTICAL
         with(mRecyclerView) {
-            setFootViewText("正在努力加载中","没有更多啦!")
+            setFootViewText("正在努力加载中", "没有更多啦!")
             defaultFootView.setLoadingDoneHint("加载完成啦!")
             this.layoutManager = layoutManager
 //            addItemDecoration(DividerItemDecoration(this@AppListActivity, DividerItemDecoration.VERTICAL))
@@ -229,7 +252,11 @@ class AppListActivity : AppCompatActivity() {
             })
 
         }
-        mAdapter = RecyclerViewAdapter(dataList)
+        mAdapter = RecyclerViewAdapter(dataList).apply {
+            onItemClickListener = {
+
+            }
+        }
         mRecyclerView.adapter = mAdapter
     }
 

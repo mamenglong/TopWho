@@ -14,8 +14,13 @@ data class AppInfo(
     var appName: String? = "",
     var packageName: String? = "",
     var versionName: String? = "",
-    var className:String?="",
+    var className: String? = "",
     var versionCode: Int? = 0,
     var appIcon: Drawable? = null,
-    var isSystemApp: Boolean = false
+    var isSystemApp: Boolean = false,
+    var minSdkVersion: Int = 0,
+    var taSdkVersion: Int = 0,
+    var sourcePath: String? = null,
+    var dataDir: String? = null,
+    var sourceDir: String? = null
 )

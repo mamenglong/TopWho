@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:background="@color/white"
+        android:layout_height="wrap_content"
+        android:padding="5dp">
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:id="@+id/tv_key"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintVertical_chainStyle="spread_inside"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@tools:sample/first_names" />
+
+    <TextView
+            app:layout_constraintStart_toEndOf="@id/tv_key"
+            android:id="@+id/tv_split"
+            app:layout_constraintTop_toTopOf="@id/tv_key"
+            android:layout_width="wrap_content"
+            app:layout_constraintEnd_toStartOf="@id/tv_value"
+            android:text=":"
+            android:layout_marginStart="1dp"
+            android:layout_marginEnd="1dp"
+            android:layout_height="wrap_content" />
+
+    <TextView
+            android:layout_width="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/tv_key"
+            android:id="@+id/tv_value"
+            app:layout_constraintStart_toEndOf="@id/tv_split"
+            android:layout_height="wrap_content"
+            tools:text="@tools:sample/last_names" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
