@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.mml.topwho.R
 import com.mml.topwho.data.AppInfo
+import kotlinx.android.synthetic.main.dialog_item_recycler_view.view.*
 import kotlinx.android.synthetic.main.item_recycler_view.view.*
 import kotlin.math.ceil
 
@@ -55,7 +56,7 @@ class RecyclerViewAdapter(private val data: List<AppInfo>) :
 
 }
 
-class DialogRecyclerViewAdapter(val map: Map<String, Any>) :
+class DialogRecyclerViewAdapter(val data: Map<String, Any>) :
     RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
     var convert: (holder: RecyclerViewAdapter.ViewHolder, position: Int) -> Unit =
         { viewHolder: RecyclerViewAdapter.ViewHolder, i: Int -> }
@@ -69,8 +70,11 @@ class DialogRecyclerViewAdapter(val map: Map<String, Any>) :
         return RecyclerViewAdapter.ViewHolder(view)
     }
 
-    override fun getItemCount(): Int = map.size
+    override fun getItemCount(): Int = data.size
     override fun onBindViewHolder(holder: RecyclerViewAdapter.ViewHolder, position: Int) {
+        holder.itemView.tv_key.text= data.entries.elementAt(position).key
+        holder.itemView.tv_value.text= data.entries.elementAt(position).value.toString()
+
         convert.invoke(holder, position)
     }
 

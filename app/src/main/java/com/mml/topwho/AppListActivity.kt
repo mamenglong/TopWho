@@ -14,12 +14,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.jcodecraeer.xrecyclerview.ProgressStyle
 import com.jcodecraeer.xrecyclerview.XRecyclerView
+import com.mml.topwho.adapter.DialogRecyclerViewAdapter
 import com.mml.topwho.adapter.RecyclerViewAdapter
 import com.mml.topwho.data.AppInfo
 import com.umeng.analytics.MobclickAgent
 import kotlinx.android.synthetic.main.activity_app_list.*
 import kotlinx.android.synthetic.main.activity_app_list.view.*
 import kotlin.math.ceil
+import kotlin.reflect.full.memberProperties
 
 
 class AppListActivity : AppCompatActivity() {
@@ -254,7 +256,9 @@ class AppListActivity : AppCompatActivity() {
         }
         mAdapter = RecyclerViewAdapter(dataList).apply {
             onItemClickListener = {
-
+                 val itemInfo= dataList[it]
+                 val map=itemInfo.javaClass.kotlin.memberProperties.map { kProperty1 -> Pair(kProperty1.name,kProperty1.get(itemInfo).toString())}.toMap()
+                val adapter=DialogRecyclerViewAdapter(map)
             }
         }
         mRecyclerView.adapter = mAdapter
