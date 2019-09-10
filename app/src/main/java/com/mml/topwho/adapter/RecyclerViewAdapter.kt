@@ -1,11 +1,14 @@
 package com.mml.topwho.adapter
 
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.mml.topwho.R
 import com.mml.topwho.data.AppInfo
+import com.mml.topwho.extSetVisibility
 import kotlinx.android.synthetic.main.dialog_item_recycler_view.view.*
 import kotlinx.android.synthetic.main.item_recycler_view.view.*
 import kotlin.math.ceil
@@ -56,7 +59,7 @@ class RecyclerViewAdapter(private val data: List<AppInfo>) :
 
 }
 
-class DialogRecyclerViewAdapter(val data: Map<String, Any>) :
+class DialogRecyclerViewAdapter(val data: Map<String, Any?>) :
     RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
     var convert: (holder: RecyclerViewAdapter.ViewHolder, position: Int) -> Unit =
         { viewHolder: RecyclerViewAdapter.ViewHolder, i: Int -> }
@@ -74,7 +77,12 @@ class DialogRecyclerViewAdapter(val data: Map<String, Any>) :
     override fun onBindViewHolder(holder: RecyclerViewAdapter.ViewHolder, position: Int) {
         holder.itemView.tv_key.text= data.entries.elementAt(position).key
         holder.itemView.tv_value.text= data.entries.elementAt(position).value.toString()
-
+        if (position==0)
+            holder.itemView.iv_icon.apply {
+                holder.itemView.tv_value.extSetVisibility(false)
+                extSetVisibility(true)
+                setImageDrawable(data.entries.elementAt(position).value as Drawable?)
+            }
         convert.invoke(holder, position)
     }
 

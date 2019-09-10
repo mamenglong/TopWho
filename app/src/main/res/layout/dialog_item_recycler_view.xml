@@ -3,37 +3,46 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:background="@color/white"
         android:layout_height="wrap_content"
+        android:background="@color/white"
         android:padding="5dp">
 
     <TextView
-            android:layout_width="wrap_content"
             android:id="@+id/tv_key"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintVertical_chainStyle="spread_inside"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_chainStyle="spread_inside"
             tools:text="@tools:sample/first_names" />
 
     <TextView
-            app:layout_constraintStart_toEndOf="@id/tv_key"
             android:id="@+id/tv_split"
-            app:layout_constraintTop_toTopOf="@id/tv_key"
             android:layout_width="wrap_content"
-            app:layout_constraintEnd_toStartOf="@id/tv_value"
-            android:text=":"
+            android:layout_height="wrap_content"
             android:layout_marginStart="1dp"
             android:layout_marginEnd="1dp"
-            android:layout_height="wrap_content" />
+            android:text=":"
+            app:layout_constraintEnd_toStartOf="@id/tv_value"
+            app:layout_constraintStart_toEndOf="@id/tv_key"
+            app:layout_constraintTop_toTopOf="@id/tv_key" />
 
     <TextView
-            android:layout_width="wrap_content"
-            app:layout_constraintTop_toTopOf="@id/tv_key"
             android:id="@+id/tv_value"
-            app:layout_constraintStart_toEndOf="@id/tv_split"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:layout_constraintStart_toEndOf="@id/tv_split"
+            app:layout_constraintTop_toTopOf="@id/tv_key"
             tools:text="@tools:sample/last_names" />
 
-
+    <ImageView
+            android:id="@+id/iv_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="40dp"
+            android:layout_marginRight="40dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

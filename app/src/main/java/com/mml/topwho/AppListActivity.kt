@@ -17,11 +17,21 @@ import com.jcodecraeer.xrecyclerview.XRecyclerView
 import com.mml.topwho.adapter.DialogRecyclerViewAdapter
 import com.mml.topwho.adapter.RecyclerViewAdapter
 import com.mml.topwho.data.AppInfo
+import com.mml.topwho.dialog.CustomDialog
 import com.umeng.analytics.MobclickAgent
 import kotlinx.android.synthetic.main.activity_app_list.*
 import kotlinx.android.synthetic.main.activity_app_list.view.*
+import kotlinx.android.synthetic.main.dialog_app_list_item_info.view.*
 import kotlin.math.ceil
 import kotlin.reflect.full.memberProperties
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Context.CLIPBOARD_SERVICE
+import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.app.ComponentActivity.ExtraData
+
+
 
 
 class AppListActivity : AppCompatActivity() {
@@ -256,9 +266,29 @@ class AppListActivity : AppCompatActivity() {
         }
         mAdapter = RecyclerViewAdapter(dataList).apply {
             onItemClickListener = {
+
                  val itemInfo= dataList[it]
-                 val map=itemInfo.javaClass.kotlin.memberProperties.map { kProperty1 -> Pair(kProperty1.name,kProperty1.get(itemInfo).toString())}.toMap()
+                 val map=itemInfo.javaClass.kotlin.memberProperties.map { kProperty1 -> Pair(kProperty1.name,kProperty1.get(itemInfo))}.toMap()
                 val adapter=DialogRecyclerViewAdapter(map)
+                CustomDialog()
+                    .setLayoutRes(R.layout.dialog_app_list_item_info)
+                    .convert { view ->
+                        view.recycler_view.adapter=adapter
+                        view.tv_copy.setOnClickListener {
+                            showDebugToast(msg = "tv_copy")
+                            //获取剪贴板管理器：
+                            val cm = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                            // 创建普通字符型ClipData
+                            val mClipData = ClipData.newPlainText("itemInfo", itemInfo.toString())
+                            // 将ClipData内容放到系统剪贴板里。
+                            cm.setPrimaryClip(mClipData)
+                        }
+                        view.tv_open.setOnClickListener {
+                            showDebugToast("tv_open")
+                        }
+                    }
+                    .setOnDismissCallback {  }
+                    .show(supportFragmentManager)
             }
         }
         mRecyclerView.adapter = mAdapter

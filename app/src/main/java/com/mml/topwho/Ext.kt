@@ -1,11 +1,13 @@
 package com.mml.topwho
 
+import android.app.Activity
 import android.os.Looper
 import android.widget.Toast
 import android.provider.Settings.canDrawOverlays
 import android.app.AppOpsManager
 import android.content.Context
 import android.content.Context.APP_OPS_SERVICE
+import android.content.Intent
 import android.os.Binder
 import androidx.core.content.ContextCompat.getSystemService
 import android.os.Build
@@ -15,6 +17,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import java.lang.reflect.AccessibleObject.setAccessible
 
 
@@ -29,6 +32,13 @@ fun showToast(msg:String)= run {
     if (looper== Looper.myLooper()){
             Toast.makeText(TopWhoApplication.instances,msg,Toast.LENGTH_SHORT).show()
     }
+}
+inline fun <reified T : Activity> Context.startActivity() {
+    val intent = Intent(this, T::class.java)
+    startActivity(intent)
+}
+fun Context.showDebugToast(msg:String)= run {
+        Toast.makeText(this,msg,Toast.LENGTH_SHORT).show()
 }
 fun View.extSetVisibility(visible: Boolean) = if (visible) {
     this.visibility = View.VISIBLE
