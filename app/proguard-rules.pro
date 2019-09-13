@@ -19,17 +19,45 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
-
+-optimizationpasses 5
+-dontusemixedcaseclassnames
+-dontskipnonpubliclibraryclasses
+-dontpreverify
+-verbose
+-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
+-keep public class * extends android.app.Activity
+-keep public class * extends android.app.Application
+-keep public class * extends android.app.Service
+-keep public class * extends android.content.BroadcastReceiver
+-keep public class * extends android.content.ContentProvider
+-keep public class * extends android.app.backup.BackupAgentHelper
+-keep public class * extends android.preference.Preference
+-keep public class com.android.vending.licensing.ILicensingService
+-keepclasseswithmembernames class *{
+native <methods>;
+}
+-keepclasseswithmembers class * {
+public <init>(android.content.Context, android.util.AttributeSet);
+}
+-keepclasseswithmembers class * {
+public <init>(android.content.Context, android.util.AttributeSet, int);
+}
+-keepclassmembers enum * {
+public static **[] values();
+public static ** valueOf(java.lang.String);
+}
+-keep class * implements android.os.Parcelable {
+public static final android.os.Parcelable$Creator *;
+}
 # 保留包：com.moos.media.entity 下面的类以及类成员
--keep public class com.mml.topwho.data.**
+-keep class com.mml.topwho.data.**
+-keep public class com.mml.topwho.annotatio.**
+-keep public class kotlin.reflect.**
+-keep public class kotlin.reflect.jvm.internal.impl.serialization.deserialization.builtins.* { public *; }
 #保留枚举
 -keepclassmembers enum * {
     **[] $VALUES;
     public *;
-}
-#保留Activity中View及其子类入参的方法，如: onClick(android.view.View)
--keepclassmembers class * extends android.app.Activity {
-   public void *(android.view.View);
 }
 #保留序列化的类
 -keepclassmembers class * implements android.os.Parcelable {

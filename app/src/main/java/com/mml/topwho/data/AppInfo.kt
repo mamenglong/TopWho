@@ -1,6 +1,7 @@
 package com.mml.topwho.data
 
 import android.graphics.drawable.Drawable
+import androidx.annotation.Keep
 import com.mml.topwho.annotatio.FieldOrderAnnotation
 
 /**
@@ -11,6 +12,7 @@ import com.mml.topwho.annotatio.FieldOrderAnnotation
  * Package: com.mml.topwho.data
  * Project: TopWho
  */
+@Keep
 data class AppInfo(
     @FieldOrderAnnotation(1)
     var appName: String? = "",
