@@ -48,6 +48,7 @@
             android:layout_marginEnd="20dp"
             android:layout_marginRight="20dp"
             android:text="详情"
+            android:textColor="@color/colorPrimary"
             app:layout_constraintBottom_toBottomOf="@id/tv_copy"
             app:layout_constraintEnd_toStartOf="@id/tv_copy" />
 
@@ -60,6 +61,7 @@
             android:layout_marginRight="20dp"
             android:layout_marginBottom="10dp"
             android:text="复制"
+            android:textColor="@color/colorAccent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/hs_view" />

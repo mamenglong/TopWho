@@ -1,10 +1,16 @@
 package com.mml.topwho
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
 import android.graphics.Rect
+import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
+import android.provider.Settings
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +22,7 @@ import com.jcodecraeer.xrecyclerview.ProgressStyle
 import com.jcodecraeer.xrecyclerview.XRecyclerView
 import com.mml.topwho.adapter.DialogRecyclerViewAdapter
 import com.mml.topwho.adapter.RecyclerViewAdapter
+import com.mml.topwho.annotatio.FieldOrderAnnotation
 import com.mml.topwho.data.AppInfo
 import com.mml.topwho.dialog.CustomDialog
 import com.umeng.analytics.MobclickAgent
@@ -23,15 +30,8 @@ import kotlinx.android.synthetic.main.activity_app_list.*
 import kotlinx.android.synthetic.main.activity_app_list.view.*
 import kotlinx.android.synthetic.main.dialog_app_list_item_info.view.*
 import kotlin.math.ceil
-import kotlin.reflect.full.memberProperties
-import android.content.ClipData
-import android.content.ClipboardManager
-import android.content.Context
-import android.content.Context.CLIPBOARD_SERVICE
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.app.ComponentActivity.ExtraData
-
-
+import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.jvm.javaField
 
 
 class AppListActivity : AppCompatActivity() {
@@ -267,13 +267,21 @@ class AppListActivity : AppCompatActivity() {
         mAdapter = RecyclerViewAdapter(dataList).apply {
             onItemClickListener = {
 
-                 val itemInfo= dataList[it]
-                 val map=itemInfo.javaClass.kotlin.memberProperties.map { kProperty1 -> Pair(kProperty1.name,kProperty1.get(itemInfo))}.toMap()
-                val adapter=DialogRecyclerViewAdapter(map)
+                val itemInfo = dataList[it]
+                val fieldList = itemInfo.javaClass.kotlin.declaredMemberProperties.toList()
+                val map = fieldList.sortedWith(Comparator.comparingInt { m ->
+                    m.javaField!!.getAnnotation(FieldOrderAnnotation::class.java)?.order ?: 0
+                }).map { kProperty1 ->
+                    Pair(
+                        kProperty1.name,
+                        kProperty1.get(itemInfo)
+                    )
+                }.toMap()
+                val adapter = DialogRecyclerViewAdapter(map)
                 CustomDialog()
                     .setLayoutRes(R.layout.dialog_app_list_item_info)
                     .convert { view ->
-                        view.recycler_view.adapter=adapter
+                        view.recycler_view.adapter = adapter
                         view.tv_copy.setOnClickListener {
                             showDebugToast(msg = "tv_copy")
                             //获取剪贴板管理器：
@@ -282,12 +290,18 @@ class AppListActivity : AppCompatActivity() {
                             val mClipData = ClipData.newPlainText("itemInfo", itemInfo.toString())
                             // 将ClipData内容放到系统剪贴板里。
                             cm.setPrimaryClip(mClipData)
+                            showToast("复制到剪切板成功")
                         }
                         view.tv_open.setOnClickListener {
                             showDebugToast("tv_open")
+                            val packageURI = Uri.parse("package:${itemInfo.packageName}")
+                            val intent =
+                                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageURI)
+                            startActivity(intent)
+
                         }
                     }
-                    .setOnDismissCallback {  }
+                    .setOnDismissCallback { }
                     .show(supportFragmentManager)
             }
         }

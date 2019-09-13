@@ -1,6 +1,7 @@
 package com.mml.topwho.data
 
 import android.graphics.drawable.Drawable
+import com.mml.topwho.annotatio.FieldOrderAnnotation
 
 /**
  * Author: Menglong Ma
@@ -11,16 +12,28 @@ import android.graphics.drawable.Drawable
  * Project: TopWho
  */
 data class AppInfo(
+    @FieldOrderAnnotation(1)
     var appName: String? = "",
+    @FieldOrderAnnotation(2)
     var packageName: String? = "",
+    @FieldOrderAnnotation(4)
     var versionName: String? = "",
+    @FieldOrderAnnotation(3)
     var className: String? = "",
+    @FieldOrderAnnotation(5)
     var versionCode: Int? = 0,
+    @FieldOrderAnnotation(6)
     var appIcon: Drawable? = null,
+    @FieldOrderAnnotation(7)
     var isSystemApp: Boolean = false,
+    @FieldOrderAnnotation(8)
     var minSdkVersion: Int = 0,
+    @FieldOrderAnnotation(9)
     var taSdkVersion: Int = 0,
+    @FieldOrderAnnotation(10)
     var sourcePath: String? = null,
+    @FieldOrderAnnotation(11)
     var dataDir: String? = null,
+    @FieldOrderAnnotation(12)
     var sourceDir: String? = null
 )

@@ -1,6 +1,5 @@
 package com.mml.topwho.adapter
 
-import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
@@ -75,9 +74,9 @@ class DialogRecyclerViewAdapter(val data: Map<String, Any?>) :
 
     override fun getItemCount(): Int = data.size
     override fun onBindViewHolder(holder: RecyclerViewAdapter.ViewHolder, position: Int) {
-        holder.itemView.tv_key.text= data.entries.elementAt(position).key
-        holder.itemView.tv_value.text= data.entries.elementAt(position).value.toString()
-        if (position==0)
+        holder.itemView.tv_key.text = data.entries.elementAt(position).key
+        holder.itemView.tv_value.text = data.entries.elementAt(position).value.toString()
+        if (position == 5)
             holder.itemView.iv_icon.apply {
                 holder.itemView.tv_value.extSetVisibility(false)
                 extSetVisibility(true)
