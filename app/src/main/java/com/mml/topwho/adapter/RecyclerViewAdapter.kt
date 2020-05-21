@@ -5,9 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.mml.topwho.PY.StickyHeaderAdapter
 import com.mml.topwho.R
 import com.mml.topwho.data.AppInfo
 import com.mml.topwho.extSetVisibility
+import kotlinx.android.synthetic.main.app_list_item_header.view.*
 import kotlinx.android.synthetic.main.dialog_item_recycler_view.view.*
 import kotlinx.android.synthetic.main.item_recycler_view.view.*
 import kotlin.math.ceil
@@ -22,8 +24,10 @@ import kotlin.math.ceil
  * Project: TopWho
  */
 class RecyclerViewAdapter(private val data: List<AppInfo>) :
-    RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>() {
+    RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>(),
+    StickyHeaderAdapter<RecyclerView.ViewHolder> {
     var onItemClickListener: (pos: Int) -> Unit = { _ -> }
+    var onCharacterChange: (Char) -> Unit = {}
     private var PAGE: Int = 0
     private var PAGE_SIZE = 10.0
 
@@ -52,6 +56,34 @@ class RecyclerViewAdapter(private val data: List<AppInfo>) :
                 onItemClickListener.invoke(position)
             }
         }
+    }
+
+    override fun getHeaderId(childAdapterPosition: Int): Long {
+        val firstChar: Char = data[childAdapterPosition].firstChar
+        val str = firstChar.toString()
+        return if (str.matches(Regex("[a-zA-Z]+"))) firstChar.toLong() else '#'.toLong()
+    }
+
+    override fun onCreateHeaderViewHolder(parent: ViewGroup): RecyclerView.ViewHolder {
+        return object : RecyclerView.ViewHolder(
+            LayoutInflater.from(parent.context)
+                .inflate(R.layout.app_list_item_header, parent, false)
+        ) {}
+    }
+
+
+    override fun onBindHeaderViewHolder(
+        holder: RecyclerView.ViewHolder,
+        childAdapterPosition: Int
+    ) {
+        val firstChar: Char = data[childAdapterPosition].firstChar
+        val str = firstChar.toString()
+        holder.itemView.tv_header.text =
+            if (str.matches(Regex("[a-zA-Z]+"))) firstChar.toString() else '#'.toString()
+    }
+
+    override fun onFirstHeaderChange(char: Char) {
+        onCharacterChange.invoke(char)
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)

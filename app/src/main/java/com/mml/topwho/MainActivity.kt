@@ -2,6 +2,7 @@ package com.mml.topwho
 
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.AlertDialog
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -14,31 +15,27 @@ import androidx.appcompat.app.AppCompatActivity
 import com.mml.topwho.fragment.SwitchFragment
 import com.mml.topwho.receiver.NotificationActionReceiver
 import com.mml.topwho.service.FloatWindowService
+import com.mml.topwho.service.TopWhoAccessibilityService
 import com.mml.topwho.sp.SP
 import com.umeng.analytics.MobclickAgent
-import com.umeng.commonsdk.statistics.common.DeviceConfig
 import kotlinx.android.synthetic.main.activity_main.*
 import tyrantgit.explosionfield.ExplosionField
-import java.util.HashMap
-import kotlin.time.MonoClock
-import androidx.core.app.ComponentActivity.ExtraData
-import androidx.core.content.ContextCompat.getSystemService
-
-
+import kotlin.jvm.internal.Intrinsics
 
 
 class MainActivity : AppCompatActivity() {
     val sp by lazy { SP(this) }
-    val TAG="MainActivity"
-   lateinit var  mExplosionField:ExplosionField
+    val TAG = "MainActivity"
+    lateinit var mExplosionField: ExplosionField
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initView()
         NotificationActionReceiver.showNotification(this, false)
-        mExplosionField=ExplosionField.attach2Window(this)
-      //  NotificationActionReceiver.notification(this)
+        mExplosionField = ExplosionField.attach2Window(this)
+        //  NotificationActionReceiver.notification(this)
     }
+
     private fun initView() {
         supportFragmentManager
             .beginTransaction()
@@ -48,6 +45,19 @@ class MainActivity : AppCompatActivity() {
             sw as Switch
             if (!isAccessibilityServiceEnabled()) {
                 val accessibleIntent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                val flattenToString: String =
+                    ComponentName(
+                        this.packageName,
+                        TopWhoAccessibilityService::class.java.name
+                    ).flattenToString()
+                Intrinsics.checkExpressionValueIsNotNull(
+                    flattenToString,
+                    "ComponentName(App.INS.pa…s.name).flattenToString()"
+                )
+                val bundle = Bundle()
+                bundle.putString(":settings:fragment_args_key", flattenToString)
+                accessibleIntent.putExtra(":settings:fragment_args_key", flattenToString)
+                accessibleIntent.putExtra(":settings:show_fragment_args", bundle)
                 startActivity(accessibleIntent)
             }
         }
@@ -58,38 +68,53 @@ class MainActivity : AppCompatActivity() {
         }
         btn_open_accessibility.setOnClickListener {
             val accessibleIntent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+            accessibleIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)//268435456
+            val flattenToString: String =
+                ComponentName(
+                    this.packageName,
+                    TopWhoAccessibilityService::class.java.name
+                ).flattenToString()
+            Intrinsics.checkExpressionValueIsNotNull(
+                flattenToString,
+                "ComponentName(App.INS.pa…s.name).flattenToString()"
+            )
+            val bundle = Bundle()
+            bundle.putString(":settings:fragment_args_key", flattenToString)
+            accessibleIntent.putExtra(":settings:fragment_args_key", flattenToString)
+            accessibleIntent.putExtra(":settings:show_fragment_args", bundle)
             startActivity(accessibleIntent)
         }
         app_list.setOnClickListener {
 //            mExplosionField.explode(it)
-           /* val map = HashMap<String, String>(1)
-            map[UmengEvent.OPEN_APPLICATION_LIST] = ""*/
+            /* val map = HashMap<String, String>(1)
+             map[UmengEvent.OPEN_APPLICATION_LIST] = ""*/
             MobclickAgent.onEvent(this, UmengEvent.OPEN_APPLICATION_LIST)
-            startActivity(Intent(this,AppListActivity::class.java))
+            startActivity(Intent(this, AppListActivity::class.java))
         }
 
     }
 
 
     private fun initSwitchStatus() {
-        Log.i("MainActivity","initSwitchStatus")
+        Log.i("MainActivity", "initSwitchStatus")
         sw_open_accessibility_permission.isChecked = isAccessibilityServiceEnabled()
-        SP.sp.switch_open_float_permission=Settings.canDrawOverlays(this)
-        if (isAccessibilityServiceEnabled()){
+        SP.sp.switch_open_float_permission = Settings.canDrawOverlays(this)
+        if (isAccessibilityServiceEnabled()) {
             btn_open_accessibility.setDrawableRight(R.drawable.ic_check_circle_48dp)
-        }else{
+        } else {
             btn_open_accessibility.setDrawableRight(R.drawable.ic_uncheck_circle_48dp)
         }
-        if (Settings.canDrawOverlays(this)){
+        if (Settings.canDrawOverlays(this)) {
             btn_open_float.setDrawableRight(R.drawable.ic_check_circle_48dp)
-        } else{
+        } else {
             btn_open_float.setDrawableRight(R.drawable.ic_uncheck_circle_48dp)
         }
     }
 
     //检查服务是否开启
     private fun isAccessibilityServiceEnabled(): Boolean {
-        val accessibilityManager = getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
+        val accessibilityManager =
+            getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
 
         val accessibilityServices = accessibilityManager.getEnabledAccessibilityServiceList(
             AccessibilityServiceInfo.FEEDBACK_ALL_MASK
@@ -106,11 +131,11 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         MobclickAgent.onResume(this)
-        Log.i("MainActivity","onResume")
+        Log.i("MainActivity", "onResume")
         initSwitchStatus()
-       run {  supportFragmentManager.fragments[0] as SwitchFragment? }?.let {
-           it.updateSwitchStatus()
-       }
+        run { supportFragmentManager.fragments[0] as SwitchFragment? }?.let {
+            it.updateSwitchStatus()
+        }
     }
 
     override fun onPause() {
@@ -118,8 +143,8 @@ class MainActivity : AppCompatActivity() {
         MobclickAgent.onPause(this)
     }
 
-    fun checkFloatPermission(context: Context):Boolean{
-        Log.i(TAG,"checkFloatPermission")
+    fun checkFloatPermission(context: Context): Boolean {
+        Log.i(TAG, "checkFloatPermission")
         if (!Settings.canDrawOverlays(context)) {
             //没有悬浮窗权限
             AlertDialog.Builder(context)
@@ -138,13 +163,14 @@ class MainActivity : AppCompatActivity() {
                 .create()
                 .show()
             return false
-        }else{ //有悬浮窗权限
+        } else { //有悬浮窗权限
             openFloatWindow()
             return true
         }
 
     }
-    private fun openFloatWindow(){
+
+    private fun openFloatWindow() {
         if (FloatWindowService.isStarted) {
             //悬浮窗服务开启
             if (sp.switch_open_float) {

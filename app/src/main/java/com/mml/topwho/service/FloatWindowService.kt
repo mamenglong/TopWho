@@ -7,14 +7,13 @@ import android.graphics.PixelFormat
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
-import android.view.Gravity
-import android.view.MotionEvent
-import android.view.View
-import android.view.WindowManager
-import android.widget.Button
+import android.view.*
 import androidx.annotation.RequiresApi
+import com.mml.topwho.R
 import com.mml.topwho.TopWhoApplication
+import com.mml.topwho.TouchContainerLayout
 import com.mml.topwho.showToast
+import kotlinx.android.synthetic.main.float_view.view.*
 import kotlin.properties.Delegates
 
 
@@ -26,7 +25,7 @@ class FloatWindowService : Service() {
     private var windowManager: WindowManager? = null
     private var layoutParams: WindowManager.LayoutParams? = null
 
-    private var button: Button? = null
+    private var container: ViewGroup? = null
 
     override fun onCreate() {
         logi("onCreate")
@@ -56,7 +55,7 @@ class FloatWindowService : Service() {
     override fun onDestroy() {
         logi("onDestroy")
         try {
-            windowManager!!.removeViewImmediate(button)
+            windowManager!!.removeViewImmediate(container)
         } catch (e: Exception) {
         }
         isStarted = false
@@ -74,31 +73,34 @@ class FloatWindowService : Service() {
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun initFloatingWindow() {
-        button = Button(applicationContext)
-        button!!.apply {
-            text = "TopWho Window"
-            setBackgroundColor(Color.argb(128,255,255,255))
-            textSize = 10f
-            isAllCaps = false
+        container = TouchContainerLayout(applicationContext)
+        val view =
+            LayoutInflater.from(applicationContext).inflate(R.layout.float_view, container!!, false)
+        container!!.apply {
+            this as TouchContainerLayout
+            addView(view)
+            view.tv_text.text = "TopWho Window"
+            setBackgroundColor(Color.argb(128, 255, 255, 255))
+            view.tv_text.textSize = 10f
+            view.tv_text.isAllCaps = false
             FloatingListener().let {
                 setOnTouchListener(it)
-//                setOnClickListener(it)
             }
         }
         addView()
     }
 
     private fun removeView() {
-        logi("removeView:$button")
-        windowManager!!.removeView(button)
+        logi("removeView:$container")
+        windowManager!!.removeView(container)
     }
 
     private fun addView() {
-        windowManager!!.addView(button, layoutParams)
-        logi("addView:$button")
+        windowManager!!.addView(container, layoutParams)
+        logi("addView:$container")
     }
 
-    private inner class FloatingListener : View.OnTouchListener{//, View.OnClickListener {
+    private inner class FloatingListener : View.OnTouchListener {//, View.OnClickListener {
 /*        override fun onClick(p0: View?) {
 
             logi("onClick")
@@ -139,8 +141,9 @@ class FloatWindowService : Service() {
         var isShowed = false
         var instances: FloatWindowService by Delegates.notNull()
         fun setText(msg: String): Unit? {
-            return instances.button?.setText(msg)
+            return instances.container?.tv_text?.setText(msg)
         }
+
         fun dismiss() {
             Log.i("FloatWindowService", "dismiss before:$isShowed")
             if (isShowed) {
@@ -152,13 +155,13 @@ class FloatWindowService : Service() {
             Log.i("FloatWindowService", "dismiss after:$isShowed")
         }
 
-        fun show(msg: String?=null) {
+        fun show(msg: String? = null) {
             Log.i("FloatWindowService", "show")
             if (!isShowed) {
                 if (isStarted) {
-                    instances.button?.text=msg?:"TopWho Window"
-                    
-                    if (instances.button != null) {
+                    instances.container?.tv_text?.text = msg ?: "TopWho Window"
+
+                    if (instances.container != null) {
                         instances.addView()
                     } else {
                         showToast("异常,请重启APP")
@@ -171,19 +174,21 @@ class FloatWindowService : Service() {
             }
             isShowed = true
         }
-        fun start(){
+
+        fun start() {
             Log.i("FloatWindowService", "start")
-            if (!FloatWindowService.isStarted){
-                TopWhoApplication.instances?.let{
-                    val intent=Intent(it.applicationContext,FloatWindowService::class.java)
+            if (!FloatWindowService.isStarted) {
+                TopWhoApplication.instances?.let {
+                    val intent = Intent(it.applicationContext, FloatWindowService::class.java)
                     it.startService(intent)
                     Log.i("FloatWindowService", "started")
                 }
             }
         }
-        fun stop(){
+
+        fun stop() {
             Log.i("FloatWindowService", "stop")
-            if (FloatWindowService.isStarted){
+            if (FloatWindowService.isStarted) {
                 FloatWindowService.instances.stopSelf()
                 Log.i("FloatWindowService", "stoped")
             }

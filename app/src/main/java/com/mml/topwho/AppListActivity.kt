@@ -6,13 +6,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
-import android.graphics.Rect
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
 import android.provider.Settings
 import android.view.MenuItem
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,6 +18,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.jcodecraeer.xrecyclerview.ProgressStyle
 import com.jcodecraeer.xrecyclerview.XRecyclerView
+import com.mml.topwho.PY.CharactersSideBar
+import com.mml.topwho.PY.PYFactory
+import com.mml.topwho.PY.StickyHeaderDecoration
 import com.mml.topwho.adapter.DialogRecyclerViewAdapter
 import com.mml.topwho.adapter.RecyclerViewAdapter
 import com.mml.topwho.annotatio.FieldOrderAnnotation
@@ -132,11 +133,24 @@ class AppListActivity : AppCompatActivity() {
         originDataList.sortByDescending {
             it.appName
         }
+        PYFactory.createPinyinList(originDataList)
         ALLPAGES = ceil(originDataList.size / PAGE_SIZE).toInt()
         CURRENTPAGE = 0
         log(msg = "ALLPAGES:$ALLPAGES  PAGESIZE:$PAGE_SIZE ALL:${originDataList.size}")
-        dataUserList.addAll(originDataList.filter { !it.isSystemApp })
-        dataSystemList.addAll(originDataList.filter { it.isSystemApp })
+        val user = originDataList.filter { !it.isSystemApp }
+        val list = user.toMutableList().apply {
+            sortBy {
+                it.firstChar
+            }
+        }
+        dataUserList.addAll(user)
+        val system = originDataList.filter { it.isSystemApp }
+        val list1 = system.toMutableList().apply {
+            sortBy {
+                it.firstChar
+            }
+        }
+        dataSystemList.addAll(list1)
     }
 
     /**
@@ -184,28 +198,89 @@ class AppListActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
         nav_view.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
+        mCharactersSideBar.setPosition(0)
+        mCharactersSideBar.setTextDialog(tv_character)
+        mCharactersSideBar.setOnTouchingLetterChangedListener(object :
+            CharactersSideBar.OnTouchingLetterChangedListener {
+            override fun onTouchingLetterChanged(position: Int, character: String) {
+                dataList.forEachIndexed { index, it ->
+                    val firstChar = if (it.firstChar.toString()
+                            .matches(Regex("[a-zA-Z]+"))
+                    ) it.firstChar.toString() else '#'
+                    if (firstChar == character) {
+                        mRecyclerView.layoutManager?.scrollToPosition(index)
+                    }
+                }
+            }
+
+        })
         val layoutManager = LinearLayoutManager(this)
         layoutManager.orientation = RecyclerView.VERTICAL
+        mAdapter = RecyclerViewAdapter(dataList).apply {
+            onItemClickListener = {
+
+                val itemInfo = dataList[it]
+                val fieldList = itemInfo.javaClass.kotlin.declaredMemberProperties.toList()
+                val map = fieldList.sortedWith(Comparator.comparingInt { m ->
+                    m.javaField!!.getAnnotation(FieldOrderAnnotation::class.java)?.order ?: 0
+                }).map { kProperty1 ->
+                    Pair(
+                        kProperty1.name,
+                        kProperty1.get(itemInfo)
+                    )
+                }.toMap()
+                val adapter = DialogRecyclerViewAdapter(map)
+                CustomDialog()
+                    .setLayoutRes(R.layout.dialog_app_list_item_info)
+                    .convert { view ->
+                        view.recycler_view.adapter = adapter
+                        view.tv_copy.setOnClickListener {
+                            showDebugToast(msg = "tv_copy")
+                            //获取剪贴板管理器：
+                            val cm = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                            // 创建普通字符型ClipData
+                            val mClipData = ClipData.newPlainText("itemInfo", itemInfo.toString())
+                            // 将ClipData内容放到系统剪贴板里。
+                            cm.setPrimaryClip(mClipData)
+                            showToast("复制到剪切板成功")
+                        }
+                        view.tv_open.setOnClickListener {
+                            showDebugToast("tv_open")
+                            val packageURI = Uri.parse("package:${itemInfo.packageName}")
+                            val intent =
+                                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageURI)
+                            startActivity(intent)
+
+                        }
+                    }
+                    .setOnDismissCallback { }
+                    .show(supportFragmentManager)
+            }
+            onCharacterChange = {
+                mCharactersSideBar.setPosition(it.toString())
+            }
+        }
         with(mRecyclerView) {
             setFootViewText("正在努力加载中", "没有更多啦!")
             defaultFootView.setLoadingDoneHint("加载完成啦!")
             this.layoutManager = layoutManager
+            addItemDecoration(StickyHeaderDecoration(mAdapter))
 //            addItemDecoration(DividerItemDecoration(this@AppListActivity, DividerItemDecoration.VERTICAL))
-            addItemDecoration(object : RecyclerView.ItemDecoration() {
-                fun convertDpToPixel(dp: Int): Int {
-                    val displayMetrics = resources.displayMetrics
-                    return (dp * displayMetrics.density).toInt()
-                }
+            /*   addItemDecoration(object : RecyclerView.ItemDecoration() {
+                   fun convertDpToPixel(dp: Int): Int {
+                       val displayMetrics = resources.displayMetrics
+                       return (dp * displayMetrics.density).toInt()
+                   }
 
-                override fun getItemOffsets(
-                    outRect: Rect,
-                    view: View,
-                    parent: RecyclerView,
-                    state: RecyclerView.State
-                ) {
-                    outRect.top = convertDpToPixel(5)
-                }
-            })
+                   override fun getItemOffsets(
+                       outRect: Rect,
+                       view: View,
+                       parent: RecyclerView,
+                       state: RecyclerView.State
+                   ) {
+                       outRect.top = convertDpToPixel(5)
+                   }
+               })*/
             setPullRefreshEnabled(true)
             setLoadingMoreEnabled(true)
             defaultRefreshHeaderView // get default refresh header view
@@ -264,48 +339,6 @@ class AppListActivity : AppCompatActivity() {
             })
 
         }
-        mAdapter = RecyclerViewAdapter(dataList).apply {
-            onItemClickListener = {
-
-                val itemInfo = dataList[it]
-                val fieldList = itemInfo.javaClass.kotlin.declaredMemberProperties.toList()
-                val map = fieldList.sortedWith(Comparator.comparingInt { m ->
-                    m.javaField!!.getAnnotation(FieldOrderAnnotation::class.java)?.order ?: 0
-                }).map { kProperty1 ->
-                    Pair(
-                        kProperty1.name,
-                        kProperty1.get(itemInfo)
-                    )
-                }.toMap()
-                val adapter = DialogRecyclerViewAdapter(map)
-                CustomDialog()
-                    .setLayoutRes(R.layout.dialog_app_list_item_info)
-                    .convert { view ->
-                        view.recycler_view.adapter = adapter
-                        view.tv_copy.setOnClickListener {
-                            showDebugToast(msg = "tv_copy")
-                            //获取剪贴板管理器：
-                            val cm = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                            // 创建普通字符型ClipData
-                            val mClipData = ClipData.newPlainText("itemInfo", itemInfo.toString())
-                            // 将ClipData内容放到系统剪贴板里。
-                            cm.setPrimaryClip(mClipData)
-                            showToast("复制到剪切板成功")
-                        }
-                        view.tv_open.setOnClickListener {
-                            showDebugToast("tv_open")
-                            val packageURI = Uri.parse("package:${itemInfo.packageName}")
-                            val intent =
-                                Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageURI)
-                            startActivity(intent)
-
-                        }
-                    }
-                    .setOnDismissCallback { }
-                    .show(supportFragmentManager)
-            }
-        }
-        mRecyclerView.adapter = mAdapter
     }
 
     private fun loadFragment(fragment: Fragment?): Boolean {
@@ -330,6 +363,9 @@ class AppListActivity : AppCompatActivity() {
 
         override fun doInBackground(vararg p0: Any?): Boolean {
             initData()
+            runOnUiThread {
+                mRecyclerView.adapter = mAdapter
+            }
             return true
         }
 

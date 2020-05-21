@@ -2,6 +2,7 @@ package com.mml.topwho.data
 
 import android.graphics.drawable.Drawable
 import androidx.annotation.Keep
+import com.mml.topwho.PY.PY
 import com.mml.topwho.annotatio.FieldOrderAnnotation
 
 /**
@@ -37,5 +38,13 @@ data class AppInfo(
     @FieldOrderAnnotation(11)
     var dataDir: String? = null,
     @FieldOrderAnnotation(12)
-    var sourceDir: String? = null
-)
+    var sourceDir: String? = null,
+    override var firstChar: Char = '#',
+    override var firstChars: String = "",
+    override var pinyins: String = "",
+    override var pinyinsTotalLength: Int = 0
+) : PY {
+    override fun zh(): String {
+        return appName ?: "名字丢了"
+    }
+}
