@@ -1,8 +1,6 @@
 package com.mml.topwho
 
 import android.content.Context
-import android.os.Build
-import android.os.VibrationEffect
 import android.os.Vibrator
 import android.util.AttributeSet
 import android.util.Log
@@ -153,26 +151,26 @@ class TouchContainerLayout @JvmOverloads constructor(
                 // 父布局不要拦截子布局的监听
                 parent.requestDisallowInterceptTouchEvent(true)
                 textStr = "ACTION_DOWN"
-                postDelayed({
-                    if (isLongTouch()) {
-                        Log.i(
-                            TAG,
-                            "$msg ACTION_DOWN mScrolling:$mIsScrolling mIsLongTouching:$mIsLongTouching"
-                        )
-                        mIsLongTouching = true
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            mVibrator.vibrate(
-                                VibrationEffect.createWaveform(mPattern, -1),
-                                null
-                            )
-                        } else {
-                            mVibrator.vibrate(mPattern, -1)
-                        }
-                        textStr = "ACTION_DOWN Long"
-                    } else {
-                        mIsLongTouching = false
-                    }
-                }, LONG_CLICK_LIMIT)
+                /*  postDelayed({
+                      if (isLongTouch()) {
+                          Log.i(
+                              TAG,
+                              "$msg ACTION_DOWN mScrolling:$mIsScrolling mIsLongTouching:$mIsLongTouching"
+                          )
+                          mIsLongTouching = true
+                          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                              mVibrator.vibrate(
+                                  VibrationEffect.createWaveform(mPattern, -1),
+                                  null
+                              )
+                          } else {
+                              mVibrator.vibrate(mPattern, -1)
+                          }
+                          textStr = "ACTION_DOWN Long"
+                      } else {
+                          mIsLongTouching = false
+                      }
+                  }, LONG_CLICK_LIMIT)*/
 
             }
             MotionEvent.ACTION_MOVE -> {

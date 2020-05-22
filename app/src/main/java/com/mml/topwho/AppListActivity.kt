@@ -98,6 +98,7 @@ class AppListActivity : AppCompatActivity() {
         dataSystemList.clear()
         listApplicationInfo = packageManager.getInstalledApplications(0)
         listPackageInfo = packageManager.getInstalledPackages(0)
+        val allList = mutableListOf<AppInfo>()
         listPackageInfo.forEach {
             with(it) {
                 val appName = applicationInfo.loadLabel(packageManager).toString()
@@ -112,7 +113,7 @@ class AppListActivity : AppCompatActivity() {
                 val sourcePath = applicationInfo.sourceDir
                 val dataDir = applicationInfo.dataDir
                 val sourceDir = applicationInfo.sourceDir
-                originDataList.add(
+                allList.add(
                     AppInfo(
                         appName,
                         packageName,
@@ -130,10 +131,13 @@ class AppListActivity : AppCompatActivity() {
                 )
             }
         }
-        originDataList.sortByDescending {
-            it.appName
+        PYFactory.createPinyinList(allList)
+        val list2 = allList.apply {
+            sortBy {
+                it.firstChar
+            }
         }
-        PYFactory.createPinyinList(originDataList)
+        originDataList.addAll(list2)
         ALLPAGES = ceil(originDataList.size / PAGE_SIZE).toInt()
         CURRENTPAGE = 0
         log(msg = "ALLPAGES:$ALLPAGES  PAGESIZE:$PAGE_SIZE ALL:${originDataList.size}")
@@ -143,7 +147,7 @@ class AppListActivity : AppCompatActivity() {
                 it.firstChar
             }
         }
-        dataUserList.addAll(user)
+        dataUserList.addAll(list)
         val system = originDataList.filter { it.isSystemApp }
         val list1 = system.toMutableList().apply {
             sortBy {

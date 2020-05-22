@@ -14,7 +14,7 @@
     <string name="touch_to_open">点击设置.</string>
     <string name="noti_action_pause">暂停</string>
     <string name="noti_action_resume">恢复</string>
-    <string name="noti_action_stop">停止</string>
+    <string name="noti_action_stop">解锁</string>
 
 
     <string name="switch_float_permission">悬浮窗权限</string>

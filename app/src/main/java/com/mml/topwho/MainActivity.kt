@@ -13,7 +13,6 @@ import android.view.accessibility.AccessibilityManager
 import android.widget.Switch
 import androidx.appcompat.app.AppCompatActivity
 import com.mml.topwho.fragment.SwitchFragment
-import com.mml.topwho.receiver.NotificationActionReceiver
 import com.mml.topwho.service.FloatWindowService
 import com.mml.topwho.service.TopWhoAccessibilityService
 import com.mml.topwho.sp.SP
@@ -31,9 +30,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initView()
-        NotificationActionReceiver.showNotification(this, false)
+        // NotificationActionReceiver.showNotification(this, false)
         mExplosionField = ExplosionField.attach2Window(this)
-        //  NotificationActionReceiver.notification(this)
+        //NotificationActionReceiver.notification(this)
     }
 
     private fun initView() {

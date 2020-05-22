@@ -1,6 +1,9 @@
 package com.mml.topwho.service
 
 import android.app.Service
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.PixelFormat
@@ -8,10 +11,13 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import android.view.*
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.annotation.RequiresApi
 import com.mml.topwho.R
 import com.mml.topwho.TopWhoApplication
 import com.mml.topwho.TouchContainerLayout
+import com.mml.topwho.receiver.NotificationActionReceiver
 import com.mml.topwho.showToast
 import kotlinx.android.synthetic.main.float_view.view.*
 import kotlin.properties.Delegates
@@ -22,6 +28,7 @@ class FloatWindowService : Service() {
         Log.i(FloatWindowService::class.java.simpleName, msg)
     }
 
+    private var notificationReceiver: NotificationActionReceiver = NotificationActionReceiver()
     private var windowManager: WindowManager? = null
     private var layoutParams: WindowManager.LayoutParams? = null
 
@@ -30,6 +37,8 @@ class FloatWindowService : Service() {
     override fun onCreate() {
         logi("onCreate")
         super.onCreate()
+        NotificationActionReceiver.register(this, notificationReceiver)
+        NotificationActionReceiver.showNotification(this)
         isStarted = true
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager?
         layoutParams = WindowManager.LayoutParams()
@@ -43,7 +52,7 @@ class FloatWindowService : Service() {
         layoutParams!!.flags =
             WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
         layoutParams!!.width = 500
-        layoutParams!!.height = 400
+        layoutParams!!.height = 300
         layoutParams!!.x = 300
         layoutParams!!.y = 300
     }
@@ -60,6 +69,7 @@ class FloatWindowService : Service() {
         }
         isStarted = false
         super.onDestroy()
+        unregisterReceiver(notificationReceiver)
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -87,7 +97,34 @@ class FloatWindowService : Service() {
                 setOnTouchListener(it)
             }
         }
+        container?.tv_text?.setOnClickListener {
+            it as TextView
+            //获取剪贴板管理器：
+            val cm: ClipboardManager =
+                getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            val mClipData = ClipData.newPlainText("Label", "${it.text}")
+            cm.setPrimaryClip(mClipData)
+            showToast("复制成功")
+        }
+        container?.iv_lock?.setOnClickListener {
+            it as ImageView
+            it.setImageResource(R.drawable.ic_lock_outline_black_24dp)
+            layoutParams!!.flags
+            layoutParams!!.flags =
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+            windowManager!!.updateViewLayout(container, layoutParams)
+        }
+        container?.iv_visibility?.setOnClickListener {
+            dismiss()
+        }
         addView()
+    }
+
+    fun unlockView() {
+        container?.iv_lock?.setImageResource(R.drawable.ic_lock_open_black_24dp)
+        layoutParams!!.flags =
+            WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+        windowManager!!.updateViewLayout(container, layoutParams)
     }
 
     private fun removeView() {
@@ -191,6 +228,12 @@ class FloatWindowService : Service() {
             if (FloatWindowService.isStarted) {
                 FloatWindowService.instances.stopSelf()
                 Log.i("FloatWindowService", "stoped")
+            }
+        }
+
+        fun unLockView() {
+            if (isShowed) {
+                instances.unlockView()
             }
         }
     }
