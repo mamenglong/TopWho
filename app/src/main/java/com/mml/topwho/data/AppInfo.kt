@@ -39,9 +39,13 @@ data class AppInfo(
     var dataDir: String? = null,
     @FieldOrderAnnotation(12)
     var sourceDir: String? = null,
+    @FieldOrderAnnotation(13)
     override var firstChar: Char = '#',
+    @FieldOrderAnnotation(14)
     override var firstChars: String = "",
+    @FieldOrderAnnotation(15)
     override var pinyins: String = "",
+    @FieldOrderAnnotation(16)
     override var pinyinsTotalLength: Int = 0
 ) : PY {
     override fun zh(): String {

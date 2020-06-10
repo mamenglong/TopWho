@@ -107,7 +107,8 @@ class AppListActivity : AppCompatActivity() {
                 val className = applicationInfo.className
                 val versionCode = versionCode
                 val icon = it.applicationInfo.loadIcon(packageManager)
-                val flag = (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
+                val flag =
+                    applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM == ApplicationInfo.FLAG_SYSTEM
                 val minSdkVersion = applicationInfo.minSdkVersion
                 val targetSdkVersion = applicationInfo.targetSdkVersion
                 val sourcePath = applicationInfo.sourceDir
@@ -132,7 +133,7 @@ class AppListActivity : AppCompatActivity() {
             }
         }
         PYFactory.createPinyinList(allList)
-        val list2 = allList.apply {
+        val list2 = allList.toMutableList().apply {
             sortBy {
                 it.firstChar
             }
