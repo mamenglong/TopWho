@@ -2,8 +2,8 @@ package com.mml.topwho.data
 
 import android.graphics.drawable.Drawable
 import androidx.annotation.Keep
-import com.mml.topwho.PY.PY
 import com.mml.topwho.annotatio.FieldOrderAnnotation
+import com.mml.topwho.py.PY
 
 /**
  * Author: Menglong Ma

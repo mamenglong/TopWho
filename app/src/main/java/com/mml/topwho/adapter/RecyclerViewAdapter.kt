@@ -5,10 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.mml.topwho.PY.StickyHeaderAdapter
 import com.mml.topwho.R
 import com.mml.topwho.data.AppInfo
 import com.mml.topwho.extSetVisibility
+import com.mml.topwho.py.StickyHeaderAdapter
 import kotlinx.android.synthetic.main.app_list_item_header.view.*
 import kotlinx.android.synthetic.main.dialog_item_recycler_view.view.*
 import kotlinx.android.synthetic.main.item_recycler_view.view.*

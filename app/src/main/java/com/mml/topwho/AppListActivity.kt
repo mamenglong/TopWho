@@ -16,19 +16,16 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.jcodecraeer.xrecyclerview.ProgressStyle
-import com.jcodecraeer.xrecyclerview.XRecyclerView
-import com.mml.topwho.PY.CharactersSideBar
-import com.mml.topwho.PY.PYFactory
-import com.mml.topwho.PY.StickyHeaderDecoration
 import com.mml.topwho.adapter.DialogRecyclerViewAdapter
 import com.mml.topwho.adapter.RecyclerViewAdapter
 import com.mml.topwho.annotatio.FieldOrderAnnotation
 import com.mml.topwho.data.AppInfo
 import com.mml.topwho.dialog.CustomDialog
+import com.mml.topwho.py.CharactersSideBar
+import com.mml.topwho.py.PYFactory
+import com.mml.topwho.py.StickyHeaderDecoration
 import com.umeng.analytics.MobclickAgent
 import kotlinx.android.synthetic.main.activity_app_list.*
-import kotlinx.android.synthetic.main.activity_app_list.view.*
 import kotlinx.android.synthetic.main.dialog_app_list_item_info.view.*
 import kotlin.math.ceil
 import kotlin.reflect.full.declaredMemberProperties
@@ -266,83 +263,26 @@ class AppListActivity : AppCompatActivity() {
             }
         }
         with(mRecyclerView) {
-            setFootViewText("正在努力加载中", "没有更多啦!")
-            defaultFootView.setLoadingDoneHint("加载完成啦!")
             this.layoutManager = layoutManager
             addItemDecoration(StickyHeaderDecoration(mAdapter))
-//            addItemDecoration(DividerItemDecoration(this@AppListActivity, DividerItemDecoration.VERTICAL))
-            /*   addItemDecoration(object : RecyclerView.ItemDecoration() {
-                   fun convertDpToPixel(dp: Int): Int {
-                       val displayMetrics = resources.displayMetrics
-                       return (dp * displayMetrics.density).toInt()
-                   }
-
-                   override fun getItemOffsets(
-                       outRect: Rect,
-                       view: View,
-                       parent: RecyclerView,
-                       state: RecyclerView.State
-                   ) {
-                       outRect.top = convertDpToPixel(5)
-                   }
-               })*/
-            setPullRefreshEnabled(true)
-            setLoadingMoreEnabled(true)
-            defaultRefreshHeaderView // get default refresh header view
-                .setRefreshTimeVisible(true)  // make refresh time visible,false means hiding
-            setRefreshProgressStyle(ProgressStyle.BallPulseSync)
-            setLoadingMoreProgressStyle(ProgressStyle.BallBeat)
-//            setLimitNumberToCallLoadMore(10)
-            setLoadingListener(object : XRecyclerView.LoadingListener {
-                override fun onLoadMore() {
-                    /*           when (navView.selectedItemId) {
-                                   R.id.navigation_home -> {
-                                       if (dataList.size <= originDataList.size) {
-                                           dataList.addAll(originDataList.subList(dataList.size - 1, dataList.size + 10))
-                                       } else {
-                                           mRecyclerView.setNoMore(true)
-                                       }
-                                   }
-                                   R.id.navigation_system -> {
-                                       if (dataList.size <= dataSystemList.size) {
-                                           dataList.addAll(dataSystemList.subList(dataList.size - 1, dataList.size + 10))
-                                       } else {
-                                           mRecyclerView.setNoMore(true)
-                                       }
-                                   }
-                                   R.id.navigation_user -> {
-                                       if (dataList.size <= dataUserList.size) {
-                                           dataList.addAll(dataUserList.subList(dataList.size - 1, dataList.size + 10))
-                                       } else {
-                                           mRecyclerView.setNoMore(true)
-                                       }
-                                   }
-                               }*/
-                    mRecyclerView.setNoMore(true)
-                    mRecyclerView.loadMoreComplete()
-                    mAdapter.notifyDataSetChanged()
-                }
-
-                override fun onRefresh() {
-                    dataList.clear()
-                    when (navView.selectedItemId) {
-                        R.id.navigation_home -> {
-                            dataList.addAll(originDataList)
-                        }
-                        R.id.navigation_system -> {
-                            dataList.addAll(dataSystemList)
-                        }
-                        R.id.navigation_user -> {
-                            dataList.addAll(dataUserList)
-                        }
+        }
+        with(mSmartRefreshLayout) {
+            setOnRefreshListener {
+                dataList.clear()
+                when (navView.selectedItemId) {
+                    R.id.navigation_home -> {
+                        dataList.addAll(originDataList)
                     }
-                    mRecyclerView.setNoMore(true)
-                    mAdapter.notifyDataSetChanged()
-                    mRecyclerView.refreshComplete()
+                    R.id.navigation_system -> {
+                        dataList.addAll(dataSystemList)
+                    }
+                    R.id.navigation_user -> {
+                        dataList.addAll(dataUserList)
+                    }
                 }
-
-            })
-
+                mAdapter.notifyDataSetChanged()
+                it.finishRefresh()
+            }
         }
     }
 
@@ -378,7 +318,7 @@ class AppListActivity : AppCompatActivity() {
 //            super.onPostExecute(result)
             if (result!!) {
                 progressBar.gone()
-                mRecyclerView.refresh()
+                mSmartRefreshLayout.autoRefresh()
             } else {
                 showToast("加载失败！")
             }
