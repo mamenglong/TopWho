@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageInfo
+import android.content.pm.ResolveInfo
 import android.net.Uri
 import android.os.AsyncTask
 import android.os.Bundle
@@ -27,6 +28,8 @@ import com.mml.topwho.py.StickyHeaderDecoration
 import com.umeng.analytics.MobclickAgent
 import kotlinx.android.synthetic.main.activity_app_list.*
 import kotlinx.android.synthetic.main.dialog_app_list_item_info.view.*
+import java.util.*
+import kotlin.Comparator
 import kotlin.math.ceil
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.javaField
@@ -95,14 +98,22 @@ class AppListActivity : AppCompatActivity() {
         dataSystemList.clear()
         listApplicationInfo = packageManager.getInstalledApplications(0)
         listPackageInfo = packageManager.getInstalledPackages(0)
+        val main = Intent("android.intent.action.MAIN")
+        main.addCategory("android.intent.category.LAUNCHER")
+        val resolveInfos =
+            packageManager.queryIntentActivities(main, 0)
+        Collections.sort(resolveInfos, ResolveInfo.DisplayNameComparator(packageManager))
         val allList = mutableListOf<AppInfo>()
         listPackageInfo.forEach {
             with(it) {
+                val resolveInfo = resolveInfos.find { resolveInfo ->
+                    resolveInfo.activityInfo.packageName == packageName
+                }
                 val appName = applicationInfo.loadLabel(packageManager).toString()
                 val packageName = packageName
                 val versionName = versionName
-                val className = applicationInfo.className
-                val versionCode = versionCode
+                val className = resolveInfo?.activityInfo?.name//applicationInfo.className
+                val versionCode = longVersionCode
                 val icon = it.applicationInfo.loadIcon(packageManager)
                 val flag =
                     applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM == ApplicationInfo.FLAG_SYSTEM

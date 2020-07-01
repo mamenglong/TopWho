@@ -24,7 +24,7 @@ data class AppInfo(
     @FieldOrderAnnotation(3)
     var className: String? = "",
     @FieldOrderAnnotation(5)
-    var versionCode: Int? = 0,
+    var versionCode: Long = 0,
     @FieldOrderAnnotation(6)
     var appIcon: Drawable? = null,
     @FieldOrderAnnotation(7)
