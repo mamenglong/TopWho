@@ -113,9 +113,11 @@ class FloatWindowService : Service() {
             layoutParams!!.flags =
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
             windowManager!!.updateViewLayout(container, layoutParams)
+            //NotificationActionReceiver.showNotification(this)
         }
         container?.iv_visibility?.setOnClickListener {
             dismiss()
+            //NotificationActionReceiver.showNotification(this)
         }
         addView()
     }
@@ -125,6 +127,7 @@ class FloatWindowService : Service() {
         layoutParams!!.flags =
             WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
         windowManager!!.updateViewLayout(container, layoutParams)
+
     }
 
     private fun removeView() {

@@ -19,7 +19,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
     private val TAG = NotificationActionReceiver::class.java.simpleName
 
     companion object {
-        private const val NOTIFICATION_ID = 12
+        private const val NOTIFICATION_ID = 0x12
         private const val ACTION_NOTIFICATION_RECEIVER_SHOW =
             "com.mml.topwho.receiver.ACTION_NOTIFICATION_RECEIVER"
         const val ACTION_NOTIFICATION_RECEIVER_RESTORE = "ACTION_NOTIFICATION_RECEIVER_RESTORE"
