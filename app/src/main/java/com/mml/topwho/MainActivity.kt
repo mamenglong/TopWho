@@ -6,33 +6,37 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import android.view.accessibility.AccessibilityManager
 import android.widget.Switch
 import androidx.appcompat.app.AppCompatActivity
+import com.mml.topwho.databinding.ActivityMainBinding
 import com.mml.topwho.fragment.SwitchFragment
+import com.mml.topwho.receiver.NotificationActionReceiver
 import com.mml.topwho.service.FloatWindowService
 import com.mml.topwho.service.TopWhoAccessibilityService
 import com.mml.topwho.sp.SP
 import com.umeng.analytics.MobclickAgent
-import kotlinx.android.synthetic.main.activity_main.*
 import tyrantgit.explosionfield.ExplosionField
 import kotlin.jvm.internal.Intrinsics
 
 
 class MainActivity : AppCompatActivity() {
+    private lateinit var activityMainBinding: ActivityMainBinding
     val sp by lazy { SP(this) }
     val TAG = "MainActivity"
     lateinit var mExplosionField: ExplosionField
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        activityMainBinding= ActivityMainBinding.inflate(layoutInflater)
+        setContentView(activityMainBinding.root)
         initView()
-        // NotificationActionReceiver.showNotification(this, false)
+        //NotificationActionReceiver.showNotification(this)
         mExplosionField = ExplosionField.attach2Window(this)
-        //NotificationActionReceiver.notification(this)
+       // NotificationActionReceiver.notification(this)
     }
 
     private fun initView() {
@@ -40,7 +44,7 @@ class MainActivity : AppCompatActivity() {
             .beginTransaction()
             .replace(R.id.frameLayout, SwitchFragment())
             .commit()
-        sw_open_accessibility_permission.setOnClickListener { sw ->
+        activityMainBinding.swOpenAccessibilityPermission.setOnClickListener { sw ->
             sw as Switch
             if (!isAccessibilityServiceEnabled()) {
                 val accessibleIntent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
@@ -60,12 +64,12 @@ class MainActivity : AppCompatActivity() {
                 startActivity(accessibleIntent)
             }
         }
-        btn_open_float.setOnClickListener {
+        activityMainBinding.btnOpenFloat.setOnClickListener {
             val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
             intent.data = Uri.parse("package:$packageName")
             startActivity(intent)
         }
-        btn_open_accessibility.setOnClickListener {
+        activityMainBinding.btnOpenAccessibility.setOnClickListener {
             val accessibleIntent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
             accessibleIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)//268435456
             val flattenToString: String =
@@ -83,7 +87,7 @@ class MainActivity : AppCompatActivity() {
             accessibleIntent.putExtra(":settings:show_fragment_args", bundle)
             startActivity(accessibleIntent)
         }
-        app_list.setOnClickListener {
+        activityMainBinding.appList.setOnClickListener {
 //            mExplosionField.explode(it)
             /* val map = HashMap<String, String>(1)
              map[UmengEvent.OPEN_APPLICATION_LIST] = ""*/
@@ -96,17 +100,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun initSwitchStatus() {
         Log.i("MainActivity", "initSwitchStatus")
-        sw_open_accessibility_permission.isChecked = isAccessibilityServiceEnabled()
+        activityMainBinding.swOpenAccessibilityPermission.isChecked = isAccessibilityServiceEnabled()
         SP.sp.switch_open_float_permission = Settings.canDrawOverlays(this)
         if (isAccessibilityServiceEnabled()) {
-            btn_open_accessibility.setDrawableRight(R.drawable.ic_check_circle_48dp)
+            activityMainBinding.btnOpenAccessibility.setDrawableRight(R.drawable.ic_check_circle_48dp)
         } else {
-            btn_open_accessibility.setDrawableRight(R.drawable.ic_uncheck_circle_48dp)
+            activityMainBinding.btnOpenAccessibility.setDrawableRight(R.drawable.ic_uncheck_circle_48dp)
         }
         if (Settings.canDrawOverlays(this)) {
-            btn_open_float.setDrawableRight(R.drawable.ic_check_circle_48dp)
+            activityMainBinding.btnOpenFloat.setDrawableRight(R.drawable.ic_check_circle_48dp)
         } else {
-            btn_open_float.setDrawableRight(R.drawable.ic_uncheck_circle_48dp)
+            activityMainBinding.btnOpenFloat.setDrawableRight(R.drawable.ic_uncheck_circle_48dp)
         }
     }
 
@@ -178,7 +182,11 @@ class MainActivity : AppCompatActivity() {
                 FloatWindowService.dismiss()
             }
         } else { //没有开启服务去开启
-            startService(Intent(this, FloatWindowService::class.java))
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(Intent(this, FloatWindowService::class.java))
+            }else{
+                startService(Intent(this, FloatWindowService::class.java))
+            }
             FloatWindowService.show("")
         }
     }

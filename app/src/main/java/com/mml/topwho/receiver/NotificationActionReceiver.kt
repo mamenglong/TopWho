@@ -19,7 +19,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
     private val TAG = NotificationActionReceiver::class.java.simpleName
 
     companion object {
-        private const val NOTIFICATION_ID = 0x12
+        private const val NOTIFICATION_ID = 1
         private const val ACTION_NOTIFICATION_RECEIVER_SHOW =
             "com.mml.topwho.receiver.ACTION_NOTIFICATION_RECEIVER"
         const val ACTION_NOTIFICATION_RECEIVER_RESTORE = "ACTION_NOTIFICATION_RECEIVER_RESTORE"
@@ -65,12 +65,12 @@ class NotificationActionReceiver : BroadcastReceiver() {
             manager.notify(14, notification)
         }
 
-        fun showNotification(context: Context) {
+        fun showNotification(context: Service) {
             val pIntent = PendingIntent.getActivity(
                 context,
                 0,
                 Intent(context, MainActivity::class.java),
-                0
+                PendingIntent.FLAG_UPDATE_CURRENT
             )
             val builder = NotificationCompat
                 .Builder(context, "default")
@@ -104,7 +104,8 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 )
                 nm.createNotificationChannel(channel)
             }
-            nm.notify(NOTIFICATION_ID, builder.build())
+            context.startForeground(NOTIFICATION_ID,builder.build())
+           // nm.notify(NOTIFICATION_ID, builder.build())
 
         }
 

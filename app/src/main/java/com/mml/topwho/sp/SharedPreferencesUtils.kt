@@ -39,7 +39,7 @@ open class SharedPreferencesUtils(context: Context) {
             if (instances == null) {
                 synchronized(SharedPreferencesUtils::class) {
                     instances =
-                        SharedPreferencesUtils(TopWhoApplication.instances!!.applicationContext)
+                        SharedPreferencesUtils(TopWhoApplication.application!!.applicationContext)
                 }
             }
             return instances

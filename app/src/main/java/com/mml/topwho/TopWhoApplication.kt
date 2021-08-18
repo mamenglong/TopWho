@@ -6,12 +6,12 @@ import com.umeng.commonsdk.UMConfigure
 
 class TopWhoApplication: Application() {
     companion object{
-        var instances:Application?=null
+        lateinit var application:Application
+        private set
     }
     override fun onCreate() {
         super.onCreate()
-        if (instances==null)
-            instances=this
+        application=this
         initUmeng()
     }
 

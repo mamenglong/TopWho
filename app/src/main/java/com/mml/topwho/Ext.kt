@@ -3,25 +3,15 @@ package com.mml.topwho
 import android.app.Activity
 import android.os.Looper
 import android.widget.Toast
-import android.provider.Settings.canDrawOverlays
-import android.app.AppOpsManager
 import android.content.Context
-import android.content.Context.APP_OPS_SERVICE
 import android.content.Intent
-import android.os.Binder
-import androidx.core.content.ContextCompat.getSystemService
-import android.os.Build
-import android.os.Binder.getCallingUid
-import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
-import java.lang.reflect.AccessibleObject.setAccessible
 
 
- fun log(tag:String?="Log",msg: String){
+fun log(tag:String?="Log",msg: String){
      if (BuildConfig.DEBUG){
          Log.i(tag,msg)
      }
@@ -30,7 +20,7 @@ import java.lang.reflect.AccessibleObject.setAccessible
 fun showToast(msg:String)= run {
     val looper=Looper.getMainLooper()
     if (looper== Looper.myLooper()){
-            Toast.makeText(TopWhoApplication.instances,msg,Toast.LENGTH_SHORT).show()
+            Toast.makeText(TopWhoApplication.application,msg,Toast.LENGTH_SHORT).show()
     }
 }
 inline fun <reified T : Activity> Context.startActivity() {

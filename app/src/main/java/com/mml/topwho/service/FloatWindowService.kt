@@ -11,15 +11,14 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import android.view.*
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
-import com.mml.topwho.R
-import com.mml.topwho.TopWhoApplication
-import com.mml.topwho.TouchContainerLayout
+import com.mml.topwho.*
+import com.mml.topwho.databinding.FloatViewBinding
 import com.mml.topwho.receiver.NotificationActionReceiver
-import com.mml.topwho.showToast
-import kotlinx.android.synthetic.main.float_view.view.*
+import kotlin.math.abs
 import kotlin.properties.Delegates
 
 
@@ -29,32 +28,32 @@ class FloatWindowService : Service() {
     }
 
     private var notificationReceiver: NotificationActionReceiver = NotificationActionReceiver()
-    private var windowManager: WindowManager? = null
-    private var layoutParams: WindowManager.LayoutParams? = null
+    private lateinit var windowManager: WindowManager
+    private lateinit var layoutParams: WindowManager.LayoutParams
 
-    private var container: ViewGroup? = null
-
+    private lateinit var container: ViewGroup
+    private lateinit var binding: FloatViewBinding
     override fun onCreate() {
         logi("onCreate")
         super.onCreate()
         NotificationActionReceiver.register(this, notificationReceiver)
         NotificationActionReceiver.showNotification(this)
         isStarted = true
-        windowManager = getSystemService(WINDOW_SERVICE) as WindowManager?
+        windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
         layoutParams = WindowManager.LayoutParams()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            layoutParams!!.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+            layoutParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
         } else {
-            layoutParams!!.type = WindowManager.LayoutParams.TYPE_PHONE
+            layoutParams.type = WindowManager.LayoutParams.TYPE_PHONE
         }
-        layoutParams!!.format = PixelFormat.RGBA_8888
-        layoutParams!!.gravity = Gravity.LEFT or Gravity.TOP
-        layoutParams!!.flags =
+        layoutParams.format = PixelFormat.RGBA_8888
+        layoutParams.gravity = Gravity.LEFT or Gravity.TOP
+        layoutParams.flags =
             WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-        layoutParams!!.width = 500
-        layoutParams!!.height = 300
-        layoutParams!!.x = 300
-        layoutParams!!.y = 300
+        layoutParams.width = 500
+        layoutParams.height = 300
+        layoutParams.x = 300
+        layoutParams.y = 300
     }
 
     override fun onBind(intent: Intent): IBinder? {
@@ -64,7 +63,7 @@ class FloatWindowService : Service() {
     override fun onDestroy() {
         logi("onDestroy")
         try {
-            windowManager!!.removeViewImmediate(container)
+            windowManager.removeViewImmediate(container)
         } catch (e: Exception) {
         }
         isStarted = false
@@ -83,21 +82,27 @@ class FloatWindowService : Service() {
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun initFloatingWindow() {
-        container = TouchContainerLayout(applicationContext)
-        val view =
-            LayoutInflater.from(applicationContext).inflate(R.layout.float_view, container!!, false)
-        container!!.apply {
-            this as TouchContainerLayout
-            addView(view)
-            view.tv_text.text = "TopWho Window"
-            setBackgroundColor(Color.argb(128, 255, 255, 255))
-            view.tv_text.textSize = 10f
-            view.tv_text.isAllCaps = false
-            FloatingListener().let {
-                setOnTouchListener(it)
-            }
+        binding = FloatViewBinding.inflate(LayoutInflater.from(applicationContext))
+        container = binding.root
+        FloatingListener().let {
+            binding.root.setOnTouchListener(it)
         }
-        container?.tv_text?.setOnClickListener {
+        binding.root.setOnClickListener {
+            if (layoutParams.height == 300) {
+                layoutParams.height = 150
+                binding.ivLock.gone()
+                binding.ivVisibility.gone()
+            } else {
+                layoutParams.height = 300
+                binding.ivLock.visible()
+                binding.ivVisibility.visible()
+            }
+            windowManager.updateViewLayout(container, layoutParams)
+        }
+        binding.tvText.text = "TopWho Window"
+        binding.tvText.textSize = 10f
+        binding.tvText.isAllCaps = false
+        binding.tvText.setOnClickListener {
             it as TextView
             //获取剪贴板管理器：
             val cm: ClipboardManager =
@@ -106,73 +111,101 @@ class FloatWindowService : Service() {
             cm.setPrimaryClip(mClipData)
             showToast("复制成功")
         }
-        container?.iv_lock?.setOnClickListener {
+        binding.ivLock.setOnClickListener {
             it as ImageView
             it.setImageResource(R.drawable.ic_lock_outline_black_24dp)
-            layoutParams!!.flags
-            layoutParams!!.flags =
+            layoutParams.flags
+            layoutParams.flags =
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-            windowManager!!.updateViewLayout(container, layoutParams)
+            windowManager.updateViewLayout(container, layoutParams)
             //NotificationActionReceiver.showNotification(this)
         }
-        container?.iv_visibility?.setOnClickListener {
+        binding.ivVisibility.setOnClickListener {
             dismiss()
             //NotificationActionReceiver.showNotification(this)
         }
         addView()
     }
 
+    fun setText(msg: String) {
+        binding.tvText.text = msg
+        val width = maxOf(binding.tvText.measuredWidth, 500)
+        layoutParams.width = width
+        windowManager.updateViewLayout(container, layoutParams)
+    }
+
     fun unlockView() {
-        container?.iv_lock?.setImageResource(R.drawable.ic_lock_open_black_24dp)
-        layoutParams!!.flags =
+        binding.ivLock.setImageResource(R.drawable.ic_lock_open_black_24dp)
+        layoutParams.flags =
             WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-        windowManager!!.updateViewLayout(container, layoutParams)
+        windowManager.updateViewLayout(container, layoutParams)
 
     }
 
     private fun removeView() {
         logi("removeView:$container")
-        windowManager!!.removeView(container)
+        windowManager.removeView(container)
     }
 
     private fun addView() {
-        windowManager!!.addView(container, layoutParams)
+        windowManager.addView(container, layoutParams)
         logi("addView:$container")
     }
 
-    private inner class FloatingListener : View.OnTouchListener {//, View.OnClickListener {
-/*        override fun onClick(p0: View?) {
-
-            logi("onClick")
-//            val accessibleIntent =  Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
-//            startActivity(accessibleIntent)
-        }*/
-
-        private var x: Int = 0
-        private var y: Int = 0
-
+    private inner class FloatingListener : View.OnTouchListener {
+        private var lastX = 0f
+        private var lastY = 0f
+        private var mLastDownTime = 0L
+        private val mTouchSlop =
+            ViewConfiguration.get(TopWhoApplication.application).scaledTouchSlop
+        private var canMoveFlag = false
+        private val countDownRunnable = Runnable {
+            canMoveFlag = true
+        }
         override fun onTouch(view: View, event: MotionEvent): Boolean {
-            logi("onTouch")
-            when (event.action) {
+            val x: Float = event.rawX
+            val y: Float = event.rawY
+            val action = event.action and MotionEvent.ACTION_MASK
+            logi("onTouch:$action")
+            when (action) {
                 MotionEvent.ACTION_DOWN -> {
-                    x = event.rawX.toInt()
-                    y = event.rawY.toInt()
+                    lastX = x
+                    lastY = y
+                    mLastDownTime = System.currentTimeMillis()
+                    view.postDelayed(countDownRunnable,200)
                 }
                 MotionEvent.ACTION_MOVE -> {
-                    val nowX = event.rawX.toInt()
-                    val nowY = event.rawY.toInt()
-                    val movedX = nowX - x
-                    val movedY = nowY - y
-                    x = nowX
-                    y = nowY
-                    layoutParams!!.x = layoutParams!!.x + movedX
-                    layoutParams!!.y = layoutParams!!.y + movedY
-                    windowManager!!.updateViewLayout(view, layoutParams)
+                    if (canMoveFlag) {
+                        val movedX = (x - lastX).toInt()
+                        val movedY = (y - lastY).toInt()
+                        lastX = x
+                        lastY = y
+                        layoutParams.x = layoutParams.x + movedX
+                        layoutParams.y = layoutParams.y + movedY
+                        windowManager.updateViewLayout(view, layoutParams)
+                    }
+                }
+                MotionEvent.ACTION_UP -> {
+                    view.removeCallbacks(countDownRunnable)
+                    val isClick = isClick(event)
+                    logi("isClick:$isClick")
+                    if (isClick) {
+                        view.performClick()
+                    }
                 }
                 else -> {
+
                 }
             }
-            return false
+            return true
+        }
+
+        private fun isClick(event: MotionEvent): Boolean {
+            val offsetX = abs(event.rawX - lastX)
+            val offsetY = abs(event.rawY - lastY)
+            val time = System.currentTimeMillis() - mLastDownTime
+            logi("isClick:$offsetX $offsetY $time $mTouchSlop")
+            return offsetX < mTouchSlop * 2f && offsetY < mTouchSlop * 2f && time < 300L
         }
     }
 
@@ -180,8 +213,8 @@ class FloatWindowService : Service() {
         var isStarted = false
         var isShowed = false
         var instances: FloatWindowService by Delegates.notNull()
-        fun setText(msg: String): Unit? {
-            return instances.container?.tv_text?.setText(msg)
+        fun setText(msg: String) {
+            instances.setText(msg)
         }
 
         fun dismiss() {
@@ -199,13 +232,10 @@ class FloatWindowService : Service() {
             Log.i("FloatWindowService", "show")
             if (!isShowed) {
                 if (isStarted) {
-                    instances.container?.tv_text?.text = msg ?: "TopWho Window"
-
-                    if (instances.container != null) {
-                        instances.addView()
-                    } else {
-                        showToast("异常,请重启APP")
-                    }
+                    instances.setText(
+                        if (msg.isNullOrBlank()) "TopWho Window" else msg
+                    )
+                    instances.addView()
                 } else {
                     showToast("请先开启悬浮窗")
                 }
@@ -217,19 +247,20 @@ class FloatWindowService : Service() {
 
         fun start() {
             Log.i("FloatWindowService", "start")
-            if (!FloatWindowService.isStarted) {
-                TopWhoApplication.instances?.let {
-                    val intent = Intent(it.applicationContext, FloatWindowService::class.java)
-                    it.startService(intent)
-                    Log.i("FloatWindowService", "started")
-                }
+            if (!isStarted) {
+                val intent = Intent(
+                    TopWhoApplication.application.applicationContext,
+                    FloatWindowService::class.java
+                )
+                TopWhoApplication.application.startService(intent)
+                Log.i("FloatWindowService", "started")
             }
         }
 
         fun stop() {
             Log.i("FloatWindowService", "stop")
-            if (FloatWindowService.isStarted) {
-                FloatWindowService.instances.stopSelf()
+            if (isStarted) {
+                instances.stopSelf()
                 Log.i("FloatWindowService", "stoped")
             }
         }

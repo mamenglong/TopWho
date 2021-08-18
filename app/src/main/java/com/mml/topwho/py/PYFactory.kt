@@ -2,7 +2,7 @@ package com.mml.topwho.py
 
 import com.github.promeg.pinyinhelper.Pinyin
 import com.github.promeg.pinyinhelper.PinyinMapDict
-import com.github.promeg.tinypinyin.lexicons.android.cncity.CnCityDict
+import com.github.promeg.tinypinyin.lexicons.java.cncity.CnCityDict
 import com.mml.topwho.TopWhoApplication
 
 object PYFactory {
@@ -10,7 +10,7 @@ object PYFactory {
 
     init {
         // 添加中文城市词典
-        Pinyin.init(Pinyin.newConfig().with(CnCityDict.getInstance(TopWhoApplication.instances)))
+        Pinyin.init(Pinyin.newConfig().with(CnCityDict.getInstance()))
 
         Pinyin.init(
             Pinyin.newConfig()

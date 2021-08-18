@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+        android:background="@drawable/float_view_bg"
+        xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:padding="8dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        xmlns:tools="http://schemas.android.com/tools">
 
     <TextView
             android:id="@+id/tv_text"
+            android:textColor="#E48902"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@string/app_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
@@ -26,6 +34,17 @@
             android:id="@+id/iv_lock"
             android:src="@drawable/ic_lock_open_black_24dp"
             app:srcCompat="@drawable/ic_lock_open_black_24dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp" />
+
+    <ImageView
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:id="@+id/iv_move"
+            android:src="@drawable/ic_baseline_touch_app_24"
+            app:srcCompat="@drawable/ic_baseline_touch_app_24"
             android:layout_width="24dp"
             android:layout_height="24dp" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -21,13 +21,13 @@ import com.mml.topwho.adapter.DialogRecyclerViewAdapter
 import com.mml.topwho.adapter.RecyclerViewAdapter
 import com.mml.topwho.annotatio.FieldOrderAnnotation
 import com.mml.topwho.data.AppInfo
+import com.mml.topwho.databinding.ActivityAppListBinding
+import com.mml.topwho.databinding.DialogAppListItemInfoBinding
 import com.mml.topwho.dialog.CustomDialog
 import com.mml.topwho.py.CharactersSideBar
 import com.mml.topwho.py.PYFactory
 import com.mml.topwho.py.StickyHeaderDecoration
 import com.umeng.analytics.MobclickAgent
-import kotlinx.android.synthetic.main.activity_app_list.*
-import kotlinx.android.synthetic.main.dialog_app_list_item_info.view.*
 import java.util.*
 import kotlin.Comparator
 import kotlin.math.ceil
@@ -36,6 +36,7 @@ import kotlin.reflect.jvm.javaField
 
 
 class AppListActivity : AppCompatActivity() {
+    private lateinit var binding:ActivityAppListBinding
     lateinit var listApplicationInfo: List<ApplicationInfo>
     lateinit var listPackageInfo: List<PackageInfo>
     private val originDataList = mutableListOf<AppInfo>()
@@ -43,7 +44,6 @@ class AppListActivity : AppCompatActivity() {
     private val dataUserList = mutableListOf<AppInfo>()
     private val dataList = mutableListOf<AppInfo>()
     private lateinit var mAdapter: RecyclerViewAdapter
-    lateinit var navView: BottomNavigationView
     var ALLPAGES: Int = 0
     var CURRENTPAGE = 0
     var PAGE_SIZE = 10.0
@@ -56,10 +56,10 @@ class AppListActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_app_list)
+        binding = ActivityAppListBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
 //        initData()
-        navView = findViewById(R.id.nav_view)
         initView()
         AppListTask().execute()
     }
@@ -210,10 +210,10 @@ class AppListActivity : AppCompatActivity() {
     private fun initView() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
-        nav_view.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
-        mCharactersSideBar.setPosition(0)
-        mCharactersSideBar.setTextDialog(tv_character)
-        mCharactersSideBar.setOnTouchingLetterChangedListener(object :
+        binding.navView.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener)
+        binding.mCharactersSideBar.setPosition(0)
+        binding.mCharactersSideBar.setTextDialog(binding.tvCharacter)
+        binding.mCharactersSideBar.setOnTouchingLetterChangedListener(object :
             CharactersSideBar.OnTouchingLetterChangedListener {
             override fun onTouchingLetterChanged(position: Int, character: String) {
                 dataList.forEachIndexed { index, it ->
@@ -221,7 +221,7 @@ class AppListActivity : AppCompatActivity() {
                             .matches(Regex("[a-zA-Z]+"))
                     ) it.firstChar.toString() else '#'
                     if (firstChar == character) {
-                        mRecyclerView.layoutManager?.scrollToPosition(index)
+                        binding.mRecyclerView.layoutManager?.scrollToPosition(index)
                     }
                 }
             }
@@ -243,11 +243,12 @@ class AppListActivity : AppCompatActivity() {
                     )
                 }.toMap()
                 val adapter = DialogRecyclerViewAdapter(map)
+                val viewBinding = DialogAppListItemInfoBinding.inflate(layoutInflater)
                 CustomDialog()
-                    .setLayoutRes(R.layout.dialog_app_list_item_info)
+                    .setCustomView(viewBinding.root)
                     .convert { view ->
-                        view.recycler_view.adapter = adapter
-                        view.tv_copy.setOnClickListener {
+                        viewBinding.recyclerView.adapter = adapter
+                        viewBinding.tvCopy.setOnClickListener {
                             showDebugToast(msg = "tv_copy")
                             //获取剪贴板管理器：
                             val cm = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -257,7 +258,7 @@ class AppListActivity : AppCompatActivity() {
                             cm.setPrimaryClip(mClipData)
                             showToast("复制到剪切板成功")
                         }
-                        view.tv_open.setOnClickListener {
+                        viewBinding.tvOpen.setOnClickListener {
                             showDebugToast("tv_open")
                             val packageURI = Uri.parse("package:${itemInfo.packageName}")
                             val intent =
@@ -270,17 +271,17 @@ class AppListActivity : AppCompatActivity() {
                     .show(supportFragmentManager)
             }
             onCharacterChange = {
-                mCharactersSideBar.setPosition(it.toString())
+                binding.mCharactersSideBar.setPosition(it.toString())
             }
         }
-        with(mRecyclerView) {
+        with(binding.mRecyclerView) {
             this.layoutManager = layoutManager
             addItemDecoration(StickyHeaderDecoration(mAdapter))
         }
-        with(mSmartRefreshLayout) {
+        with(binding.mSmartRefreshLayout) {
             setOnRefreshListener {
                 dataList.clear()
-                when (navView.selectedItemId) {
+                when ( binding.navView.selectedItemId) {
                     R.id.navigation_home -> {
                         dataList.addAll(originDataList)
                     }
@@ -313,14 +314,14 @@ class AppListActivity : AppCompatActivity() {
 
         override fun onPreExecute() {
             super.onPreExecute()
-            progressBar.visible()
+            binding.progressBar.visible()
 
         }
 
         override fun doInBackground(vararg p0: Any?): Boolean {
             initData()
             runOnUiThread {
-                mRecyclerView.adapter = mAdapter
+                binding.mRecyclerView.adapter = mAdapter
             }
             return true
         }
@@ -328,8 +329,8 @@ class AppListActivity : AppCompatActivity() {
         override fun onPostExecute(result: Boolean?) {
 //            super.onPostExecute(result)
             if (result!!) {
-                progressBar.gone()
-                mSmartRefreshLayout.autoRefresh()
+                binding.progressBar.gone()
+                binding.mSmartRefreshLayout.autoRefresh()
             } else {
                 showToast("加载失败！")
             }

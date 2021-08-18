@@ -8,7 +8,6 @@ import android.os.Binder
 import android.os.Build
 import android.provider.Settings
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatDialogFragment
 import androidx.fragment.app.Fragment
 import com.mml.topwho.ConstantString
 import com.mml.topwho.R
@@ -118,7 +117,7 @@ class Util {
                           FloatWindowService.show()
                       }
                   } else{
-                      TopWhoApplication.instances?.let {
+                      TopWhoApplication.application?.let {
                           it.startService(Intent(it,FloatWindowService::class.java))
                       }
                   }
