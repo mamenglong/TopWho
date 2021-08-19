@@ -1,10 +1,12 @@
 package com.mml.topwho
 
+import android.Manifest
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.AlertDialog
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -12,6 +14,7 @@ import android.provider.Settings
 import android.util.Log
 import android.view.accessibility.AccessibilityManager
 import android.widget.Switch
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.mml.topwho.databinding.ActivityMainBinding
 import com.mml.topwho.fragment.SwitchFragment
@@ -21,7 +24,11 @@ import com.mml.topwho.service.TopWhoAccessibilityService
 import com.mml.topwho.sp.SP
 import com.umeng.analytics.MobclickAgent
 import tyrantgit.explosionfield.ExplosionField
+import java.io.DataOutputStream
+import java.lang.Exception
+import java.security.Permission
 import kotlin.jvm.internal.Intrinsics
+import androidx.core.app.ActivityCompat.startActivityForResult
 
 
 class MainActivity : AppCompatActivity() {
@@ -29,14 +36,21 @@ class MainActivity : AppCompatActivity() {
     val sp by lazy { SP(this) }
     val TAG = "MainActivity"
     lateinit var mExplosionField: ExplosionField
+    private val writeSettingActivityResultContracts =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            if (Settings.System.canWrite(this)) {
+                writeSetting()
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        activityMainBinding= ActivityMainBinding.inflate(layoutInflater)
+        activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(activityMainBinding.root)
         initView()
         //NotificationActionReceiver.showNotification(this)
         mExplosionField = ExplosionField.attach2Window(this)
-       // NotificationActionReceiver.notification(this)
+        // NotificationActionReceiver.notification(this)
     }
 
     private fun initView() {
@@ -95,12 +109,70 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, AppListActivity::class.java))
         }
 
+        activityMainBinding.btnRoot.setOnClickListener {
+            kotlin.runCatching {
+                upgradeRootPermission(packageCodePath)
+            }.onSuccess {
+                showToast("root权限:${it}")
+                if (it) {
+                    if (Settings.System.canWrite(this)) {
+                        writeSetting()
+                    } else {
+                        val intent = Intent(
+                            Settings.ACTION_MANAGE_WRITE_SETTINGS,
+                            Uri.parse("package:$packageName")
+                        )
+                        writeSettingActivityResultContracts.launch(intent)
+                    }
+                }
+            }.onFailure {
+                showToast("${it.message}")
+            }
+        }
     }
 
+    private fun writeSetting() {
+        Settings.Secure.putString(
+            contentResolver,
+            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
+            "com.mml.topwho/com.mml.topwho.service.TopWhoAccessibilityService"
+        );
+        Settings.Secure.putString(
+            contentResolver,
+            Settings.Secure.ACCESSIBILITY_ENABLED, "1"
+        )
+        initSwitchStatus()
+    }
+
+    /**
+     * 应用程序运行命令获取 Root权限，设备必须已破解(获得ROOT权限)
+     *
+     * @return 应用程序是/否获取Root权限
+     */
+    private fun upgradeRootPermission(pkgCodePath: String): Boolean {
+        var process: Process? = null
+        var os: DataOutputStream? = null
+        try {
+            val cmd = "chmod 777 $pkgCodePath"
+            process = Runtime.getRuntime().exec("su") // 切换到root帐号
+            os = DataOutputStream(process.outputStream)
+            os.use {
+                os.writeBytes(cmd)
+                os.writeBytes("exit\n")
+                os.flush()
+            }
+            process.waitFor()
+            process!!.destroy()
+        } catch (e: Exception) {
+            return false
+        }
+        return true
+    }
 
     private fun initSwitchStatus() {
         Log.i("MainActivity", "initSwitchStatus")
-        activityMainBinding.swOpenAccessibilityPermission.isChecked = isAccessibilityServiceEnabled()
+        activityMainBinding.swOpenAccessibilityPermission.isChecked =
+            isAccessibilityServiceEnabled()
         SP.sp.switch_open_float_permission = Settings.canDrawOverlays(this)
         if (isAccessibilityServiceEnabled()) {
             activityMainBinding.btnOpenAccessibility.setDrawableRight(R.drawable.ic_check_circle_48dp)
@@ -184,7 +256,7 @@ class MainActivity : AppCompatActivity() {
         } else { //没有开启服务去开启
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(Intent(this, FloatWindowService::class.java))
-            }else{
+            } else {
                 startService(Intent(this, FloatWindowService::class.java))
             }
             FloatWindowService.show("")

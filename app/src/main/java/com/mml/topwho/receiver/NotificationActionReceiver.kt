@@ -73,7 +73,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 PendingIntent.FLAG_UPDATE_CURRENT
             )
             val builder = NotificationCompat
-                .Builder(context, "default")
+                .Builder(context, "channelId")
                 .setContentTitle(
                     context.getString(
                         R.string.is_running,
@@ -94,16 +94,6 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 getPendingIntent(context, ACTION_UNLOCK)
             )
                 .setContentIntent(pIntent)
-
-            val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val channel = NotificationChannel(
-                    "channelId",
-                    "通知",
-                    NotificationManager.IMPORTANCE_DEFAULT
-                )
-                nm.createNotificationChannel(channel)
-            }
             context.startForeground(NOTIFICATION_ID,builder.build())
            // nm.notify(NOTIFICATION_ID, builder.build())
 

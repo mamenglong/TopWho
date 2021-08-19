@@ -58,6 +58,15 @@
             android:drawableRight="@drawable/ic_check_circle_48dp"
             android:textColor="#ffffffff"
             android:text="悬浮窗"/>
+    <Button
+            android:text="已root直接开启"
+            android:id="@+id/btn_root"
+            app:layout_constraintTop_toBottomOf="@id/btn_open_accessibility"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
     <Button android:layout_width="match_parent"
             android:id="@+id/app_list"
             android:text="APP包名查看"
