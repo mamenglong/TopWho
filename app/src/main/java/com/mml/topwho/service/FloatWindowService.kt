@@ -5,13 +5,11 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.graphics.PixelFormat
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import android.view.*
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.RequiresApi
@@ -97,7 +95,7 @@ class FloatWindowService : Service() {
                 binding.ivLock.visible()
                 binding.ivVisibility.visible()
             }
-            windowManager.updateViewLayout(container, layoutParams)
+            updateView()
         }
         binding.tvText.text = "TopWho Window"
         binding.tvText.textSize = 10f
@@ -117,7 +115,7 @@ class FloatWindowService : Service() {
             layoutParams.flags
             layoutParams.flags =
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-            windowManager.updateViewLayout(container, layoutParams)
+            updateView()
             //NotificationActionReceiver.showNotification(this)
         }
         binding.ivVisibility.setOnClickListener {
@@ -131,22 +129,24 @@ class FloatWindowService : Service() {
         binding.tvText.text = msg
         val width = maxOf(binding.tvText.measuredWidth, 500)
         layoutParams.width = width
-        windowManager.updateViewLayout(container, layoutParams)
+        updateView()
     }
 
     fun unlockView() {
         binding.ivLock.setImageResource(R.drawable.ic_lock_open_black_24dp)
         layoutParams.flags =
             WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-        windowManager.updateViewLayout(container, layoutParams)
-
+        updateView()
     }
 
     private fun removeView() {
         logi("removeView:$container")
         windowManager.removeView(container)
     }
-
+    private fun updateView() {
+        windowManager.updateViewLayout(container, layoutParams)
+        logi("updateView:$container")
+    }
     private fun addView() {
         windowManager.addView(container, layoutParams)
         logi("addView:$container")
@@ -232,10 +232,10 @@ class FloatWindowService : Service() {
             Log.i("FloatWindowService", "show")
             if (!isShowed) {
                 if (isStarted) {
+                    instances.addView()
                     instances.setText(
                         if (msg.isNullOrBlank()) "TopWho Window" else msg
                     )
-                    instances.addView()
                 } else {
                     showToast("请先开启悬浮窗")
                 }

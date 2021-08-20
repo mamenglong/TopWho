@@ -1,6 +1,8 @@
 package com.mml.topwho.util
 
 import android.app.AppOpsManager
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -117,7 +119,7 @@ class Util {
                           FloatWindowService.show()
                       }
                   } else{
-                      TopWhoApplication.application?.let {
+                      TopWhoApplication.application.let {
                           it.startService(Intent(it,FloatWindowService::class.java))
                       }
                   }
@@ -142,6 +144,15 @@ class Util {
               } catch (e: Exception) {
                   ""
               }
+          }
+
+          fun copyText(context: Context,msg:String){
+              //获取剪贴板管理器：
+              val cm: ClipboardManager =
+                  context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+              val mClipData = ClipData.newPlainText("Label", msg)
+              cm.setPrimaryClip(mClipData)
+              showToast("复制成功")
           }
       }
 }

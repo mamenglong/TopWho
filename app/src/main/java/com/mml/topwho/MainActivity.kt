@@ -29,6 +29,8 @@ import java.lang.Exception
 import java.security.Permission
 import kotlin.jvm.internal.Intrinsics
 import androidx.core.app.ActivityCompat.startActivityForResult
+import com.mml.topwho.util.RootUtil
+import com.mml.topwho.util.Util
 
 
 class MainActivity : AppCompatActivity() {
@@ -39,7 +41,7 @@ class MainActivity : AppCompatActivity() {
     private val writeSettingActivityResultContracts =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             if (Settings.System.canWrite(this)) {
-                writeSetting()
+
             }
         }
 
@@ -110,64 +112,49 @@ class MainActivity : AppCompatActivity() {
         }
 
         activityMainBinding.btnRoot.setOnClickListener {
+            activityMainBinding.progress.visible()
             kotlin.runCatching {
-                upgradeRootPermission(packageCodePath)
+                RootUtil.execAccessibilityCmd()
             }.onSuccess {
                 showToast("root权限:${it}")
-                if (it) {
-                    if (Settings.System.canWrite(this)) {
-                        writeSetting()
-                    } else {
-                        val intent = Intent(
-                            Settings.ACTION_MANAGE_WRITE_SETTINGS,
-                            Uri.parse("package:$packageName")
-                        )
-                        writeSettingActivityResultContracts.launch(intent)
-                    }
-                }
+                activityMainBinding.progress.gone()
+                activityMainBinding.swOpenAccessibilityPermission.isChecked = it
             }.onFailure {
+                activityMainBinding.progress.gone()
                 showToast("${it.message}")
             }
         }
-    }
-
-    private fun writeSetting() {
-        Settings.Secure.putString(
-            contentResolver,
-            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES,
-            "com.mml.topwho/com.mml.topwho.service.TopWhoAccessibilityService"
-        );
-        Settings.Secure.putString(
-            contentResolver,
-            Settings.Secure.ACCESSIBILITY_ENABLED, "1"
-        )
-        initSwitchStatus()
-    }
-
-    /**
-     * 应用程序运行命令获取 Root权限，设备必须已破解(获得ROOT权限)
-     *
-     * @return 应用程序是/否获取Root权限
-     */
-    private fun upgradeRootPermission(pkgCodePath: String): Boolean {
-        var process: Process? = null
-        var os: DataOutputStream? = null
-        try {
-            val cmd = "chmod 777 $pkgCodePath"
-            process = Runtime.getRuntime().exec("su") // 切换到root帐号
-            os = DataOutputStream(process.outputStream)
-            os.use {
-                os.writeBytes(cmd)
-                os.writeBytes("exit\n")
-                os.flush()
+        activityMainBinding.btnRootClose.setOnClickListener {
+            if (isAccessibilityServiceEnabled().not()){
+                return@setOnClickListener
             }
-            process.waitFor()
-            process!!.destroy()
-        } catch (e: Exception) {
-            return false
+            activityMainBinding.progress.visible()
+            kotlin.runCatching {
+                RootUtil.execAccessibilityCmd(false)
+            }.onSuccess {
+                showToast("root权限:${it}")
+                activityMainBinding.progress.gone()
+                activityMainBinding.swOpenAccessibilityPermission.isChecked = !it
+            }.onFailure {
+                activityMainBinding.progress.gone()
+                showToast("${it.message}")
+            }
         }
-        return true
+        if (RootUtil.isDeviceRooted()){
+            activityMainBinding.tvNotRootTip.gone()
+        }else{
+            activityMainBinding.tvNotRootTip.also {
+                it.setOnClickListener {
+                    Util.copyText(this,"adb shell pm grant PKG android.permission.WRITE_SECURE_SETTINGS")
+                }
+                it.visible()
+            }
+        }
     }
+
+
+
+
 
     private fun initSwitchStatus() {
         Log.i("MainActivity", "initSwitchStatus")

@@ -65,7 +65,7 @@ class NotificationActionReceiver : BroadcastReceiver() {
             manager.notify(14, notification)
         }
 
-        fun showNotification(context: Service) {
+        fun showNotification(context: Context) {
             val pIntent = PendingIntent.getActivity(
                 context,
                 0,
@@ -94,8 +94,16 @@ class NotificationActionReceiver : BroadcastReceiver() {
                 getPendingIntent(context, ACTION_UNLOCK)
             )
                 .setContentIntent(pIntent)
-            context.startForeground(NOTIFICATION_ID,builder.build())
-           // nm.notify(NOTIFICATION_ID, builder.build())
+            val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val channel = NotificationChannel(
+                    "channelId",
+                    "通知",
+                    NotificationManager.IMPORTANCE_DEFAULT
+                )
+                nm.createNotificationChannel(channel)
+            }
+            nm.notify(NOTIFICATION_ID, builder.build())
 
         }
 

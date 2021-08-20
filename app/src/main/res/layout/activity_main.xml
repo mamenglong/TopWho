@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".MainActivity">
-    <Switch android:layout_width="match_parent"
+    <androidx.appcompat.widget.SwitchCompat android:layout_width="match_parent"
             android:id="@+id/sw_open_float_permission"
             android:visibility="gone"
             android:layout_height="wrap_content"
@@ -22,7 +22,7 @@
                  app:layout_constraintTop_toTopOf="parent"
                  app:layout_constraintBottom_toTopOf="@id/sw_open_accessibility_permission"
                  android:background="@drawable/item_background"/>
-    <Switch android:layout_width="match_parent"
+    <androidx.appcompat.widget.SwitchCompat android:layout_width="match_parent"
             android:id="@+id/sw_open_accessibility_permission"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
@@ -32,7 +32,7 @@
             android:background="@drawable/item_background"
             android:checked="false"
             android:text="@string/sw_open_accessibility_permission"/>
-    <Button android:layout_width="0dp"
+    <TextView android:layout_width="0dp"
             android:id="@+id/btn_open_accessibility"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
@@ -41,11 +41,10 @@
             android:gravity="center"
             android:background="@drawable/btn_bg"
             android:textSize="16sp"
-            android:drawableEnd="@drawable/ic_check_circle_48dp"
-            android:drawableRight="@drawable/ic_check_circle_48dp"
             android:textColor="#ffffffff"
-            android:text="无障碍"/>
-    <Button
+            android:text="无障碍"
+            app:drawableEndCompat="@drawable/ic_check_circle_48dp" />
+    <TextView
             android:id="@+id/btn_open_float"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -54,24 +53,75 @@
             app:layout_constraintTop_toTopOf="@id/btn_open_accessibility"
             android:background="@drawable/btn_bg"
             android:textSize="16sp"
-            android:drawableEnd="@drawable/ic_check_circle_48dp"
-            android:drawableRight="@drawable/ic_check_circle_48dp"
+            android:gravity="center"
             android:textColor="#ffffffff"
-            android:text="悬浮窗"/>
-    <Button
+            android:text="悬浮窗"
+            app:drawableEndCompat="@drawable/ic_check_circle_48dp" />
+    <com.google.android.material.button.MaterialButton
             android:text="已root直接开启"
             android:id="@+id/btn_root"
             app:layout_constraintTop_toBottomOf="@id/btn_open_accessibility"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_root_close"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            app:strokeColor="#39A0AD"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            app:strokeWidth="1dp"
+            app:cornerRadius="24dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="1dp"
+            android:paddingBottom="1dp"
+            android:backgroundTint="#1876C1"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"/>
+    <com.google.android.material.button.MaterialButton
+            android:text="已root直接关闭"
+            android:id="@+id/btn_root_close"
+            app:layout_constraintTop_toBottomOf="@id/btn_open_accessibility"
+            app:layout_constraintStart_toEndOf="@+id/btn_root"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="20dp"
+            android:gravity="center"
+            app:strokeColor="#39A0AD"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            app:strokeWidth="1dp"
+            app:cornerRadius="24dp"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp"
+            android:paddingTop="1dp"
+            android:paddingBottom="1dp"
+            android:backgroundTint="#1876C1"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"/>
+
+    <TextView
+            app:layout_constraintStart_toStartOf="@id/btn_root"
+            app:layout_constraintTop_toBottomOf="@id/btn_root"
+            android:padding="5dp"
+            android:id="@+id/tvNotRootTip"
+            android:text="adb执行以下代码:\nadb shell pm grant PKG android.permission.WRITE_SECURE_SETTINGS"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-    <Button android:layout_width="match_parent"
+    <TextView android:layout_width="match_parent"
             android:id="@+id/app_list"
             android:text="APP包名查看"
+            android:gravity="center"
             android:background="@drawable/btn_bg"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="48dp"/>
 
+    <ProgressBar
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:id="@+id/progress"
+            android:visibility="gone"
+            tools:visibility="visible"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
